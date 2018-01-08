@@ -8,7 +8,6 @@ class Climber
 {
     protected $setable = [
       'tree',
-      'ID'
     ];
     protected $hookable = [
         'top',
@@ -17,7 +16,6 @@ class Climber
         'link',
     ];
 
-    protected $ID;
     protected $tree = [];
 
     protected $topClass = 'simpleMenu';
@@ -33,15 +31,20 @@ class Climber
     protected $itemHooks = [];
     protected $linkHooks = [];
 
-    public function __construct($menuID)
+    /**
+     * Class constructor.
+     *
+     * This expects to be given an array that is either the result of
+     * `wp_get_nav_menu_items()` or as the same structure.
+     *
+     * The tree can be planted later with a call to the `nursery()` method.
+     *
+     * @param array $seed
+     */
+    public function __construct($seed)
     {
-        $this->ID = (int) $menuID;
-        if (is_array($seed = wp_get_nav_menu_items($this->ID))) {
-            $this->tree = $this->prune(
-                $this->plant(
-                    $seed
-                )
-            );
+        if (is_array($seed)) {
+            $this->nursery($seed);
         }
     }
 
@@ -127,7 +130,7 @@ class Climber
                         $return = sprintf(
                             '%s="%s"',
                             Z\Strings::clean($current[0], "-", "/[^[:alnum:]-]/u"),
-                            esc_attr($current[1])
+                            htmlspecialchars($current[1], ENT_QUOTES)
                         );
                     }
 
@@ -186,6 +189,22 @@ class Climber
         }
 
         return $data;
+    }
+
+    /**
+     * Plants the tree.
+     *
+     * This expects to be given an array that is either the result of
+     * `wp_get_nav_menu_items()` or as the same structure.
+     *
+     * @param array $seed
+     * @return void
+     */
+    public function nursery(array $seed)
+    {
+        $this->tree = $this->prune(
+            $this->plant($seed)
+        );
     }
 
   /**
@@ -298,7 +317,7 @@ class Climber
     /**
      * Sprouts a new branch.
      *
-     * This created a new menu (or, more often, a submenu). $level reflects
+     * This creates a new menu (or, more often, a submenu). $level reflects
      * how 'deep' in the menu we are. The very top level is 0; the next level
      * of submenus is 1, etc.
      *
