@@ -2,6 +2,8 @@
 
 namespace Livy\Climber;
 
+use \Zenodorus as Z;
+
 class Climber
 {
     protected $setable = [
@@ -40,7 +42,7 @@ class Climber
    */
     public function __toString()
     {
-        return $this->sprout($this->tree);
+        return $this->element($this->tree);
     }
 
   /**
@@ -105,25 +107,25 @@ class Climber
    */
     protected function attrs(array $attrs)
     {
-        if (!Zenodorus\Arrays::isEmpty($attrs)) {
+        if (!Z\Arrays::isEmpty($attrs)) {
             return array_reduce($attrs, function ($carry, $current) {
                 if (isset($current[0])) {
                     $return = false;
                     if (!isset($current[1])) {
-                        $return = Zenodorus\Strings::clean($current[0], "-", "/[^[:alnum:]-]/u");
+                        $return = Z\Strings::clean($current[0], "-", "/[^[:alnum:]-]/u");
                     } else {
                         $return = sprintf(
                             '%s="%s"',
-                            Zenodorus\Strings::clean($current[0], "-", "/[^[:alnum:]-]/u"),
+                            Z\Strings::clean($current[0], "-", "/[^[:alnum:]-]/u"),
                             esc_attr($current[1])
                         );
                     }
 
-                    return $return ? Zenodorus\Strings::addNew($return, $carry) : $carry;
+                    return $return ? Z\Strings::addNew($return, $carry) : $carry;
                 }
 
                 return $carry;
-            });
+            }, '');
         }
 
         return null;
@@ -189,10 +191,14 @@ class Climber
     protected function leaf(\WP_Post $leaf, $level = 0)
     {
         return sprintf(
-            "<li>%s%s</li>",
+            '<li class="%1$s" %2$s>%3$s%4$s</li>',
+            $this->itemClass,
+            $this->attrs($this->itemAttr),
             sprintf(
-                "<a href='%s'>%s</a>",
+                '<a href="%1$s" class="%2$s" %3$s>%4$s</a>',
                 get_permalink($leaf->object_id),
+                $this->linkClass,
+                $this->attrs($this->linkAttr),
                 $leaf->title
             ),
             count($leaf->children) > 0
@@ -204,11 +210,38 @@ class Climber
     protected function sprout($children, $level = 0)
     {
         return sprintf(
-            "<ul data-level='%s'>%s</ul>",
+            '<ul class="%1$s level-%2$s" %3$s>%4$s</ul>',
+            $level > 0
+                ? sprintf('%1$s %1$s--submenu', $this->menuClass)
+                : $this->menuClass,
             $level,
+            $this->attrs($this->menuAttr),
             array_reduce($children, function ($carry, $child) use ($level) {
                 return $carry . $this->leaf($child, $level + 1);
             })
         );
+    }
+
+    /**
+     * Return (or optionally echo) the full HTML for the menu.
+     *
+     * @param array $tree
+     * @param boolean $echo
+     * @return string
+     */
+    public function element(array $tree, $echo = false)
+    {
+        $menu = sprintf(
+            '<nav class="%1$s" %2$s>%3$s</nav>',
+            $this->topClass,
+            $this->attrs($this->menuAttr),
+            $this->sprout($tree)
+        );
+
+        if ($echo) {
+            echo $menu;
+        } else {
+            return $menu;
+        }
     }
 }
