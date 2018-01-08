@@ -5,9 +5,11 @@ namespace Livy\Climber;
 class Climber
 {
     protected $setable = [
-      'tree'
+      'tree',
+      'ID'
     ];
 
+    protected $ID;
     protected $tree = [];
 
     protected $topClass = 'simpleMenu';
@@ -19,16 +21,16 @@ class Climber
     protected $itemAttr = [];
     protected $linkAttr = [];
 
-    public function __construct(int $menuID)
+    public function __construct($menuID)
     {
-        $this->ID = $menuID;
-        $this->tree = $this->prune(
-            $this->plant(
-                wp_get_nav_menu_items($this->ID)
-            )
-        );
-
-        // var_dump($this->tree);
+        $this->ID = (int) $menuID;
+        if (is_array($seed = wp_get_nav_menu_items($this->ID))) {
+            $this->tree = $this->prune(
+                $this->plant(
+                    $seed
+                )
+            );
+        }
     }
 
   /**
@@ -184,7 +186,7 @@ class Climber
    * @param integer $level
    * @return void
    */
-    protected function leaf(WP_Post $leaf, $level = 0)
+    protected function leaf(\WP_Post $leaf, $level = 0)
     {
         return sprintf(
             "<li>%s%s</li>",
