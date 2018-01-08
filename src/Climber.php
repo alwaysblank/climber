@@ -145,6 +145,30 @@ class Climber
     }
 
     /**
+     * Gets the URL for a given leaf.
+     *
+     * This is essentially a wrapper for `get_permalink()`. By encapsulating
+     * this call in such a way, we can account for situations (i.e. testing)
+     * where `get_permalink()` is unavailable.
+     *
+     * WARNING
+     *
+     * As currently written, the non-`get_permalink()` url is not intended
+     * to be *at all* functional—it is only there so something is returned.
+     *
+     * @param \WP_Post $leaf
+     * @return void
+     */
+    protected function url(\WP_Post $leaf)
+    {
+        if (function_exists('get_permalink')) {
+            return get_permalink($leaf->object_id);
+        } else {
+            return '/' . Z\Strings::clean($leaf->title, '-');
+        }
+    }
+
+    /**
      * Hook up a callback to a processing step.
      *
      * Ultimately callbacks are run through `call_user_func()`, so you
