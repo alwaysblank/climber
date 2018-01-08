@@ -1,5 +1,5 @@
 {
-    "name": "alwaysblank/climber",
+    "name": "livy/climber",
     "description": "An alternative to WordPress's Walker system for navigational menus.",
     "license": "MIT",
     "authors": [
@@ -14,6 +14,11 @@
     },
     "require-dev": {
       "zenodorus/core": "dev-master"
+    },
+    "autoload": {
+        "psr-4": {
+            "Livy\\Climber\\": "src"
+        }
     },
     "scripts": {
       "check": ["phpcs --standard=vendor/zenodorus/core/phpcs.xml src tests"],
