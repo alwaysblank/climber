@@ -15,7 +15,6 @@ class Climber
         'menu',
         'item',
         'link',
-        'final',
     ];
 
     protected $ID;
@@ -33,7 +32,6 @@ class Climber
     protected $menuHooks = [];
     protected $itemHooks = [];
     protected $linkHooks = [];
-    protected $finalHooks = [];
 
     public function __construct($menuID)
     {
@@ -310,14 +308,21 @@ class Climber
      */
     protected function sprout(array $children, $level = 0)
     {
-        return sprintf(
-            '<ul class="%1$s level-%2$s" %3$s>%4$s</ul>',
-            $level > 0
+        $menuData = $this->runHook('menu', [
+            'class' => $level > 0
                 ? sprintf('%1$s %1$s--submenu', $this->menuClass)
                 : $this->menuClass,
-            $level,
-            $this->attrs($this->menuAttr),
-            array_reduce($children, function ($carry, $child) use ($level) {
+            'level' => $level,
+            'attrs' => $this->attrs($this->menuAttr),
+            'children' => $children,
+        ]);
+
+        return sprintf(
+            '<ul class="%1$s level-%2$s" %3$s>%4$s</ul>',
+            $menuData['class'],
+            $menuData['level'],
+            $menuData['attrs'],
+            array_reduce($menuData['children'], function ($carry, $child) use ($level) {
                 return $carry . $this->leaf($child, $level + 1);
             })
         );
@@ -331,14 +336,21 @@ class Climber
      */
     public function element($echo = false)
     {
+        $topData = $this->runHook('top', [
+            'class' => $this->topClass,
+            'attrs' => $this->attrs($this->menuAttr),
+            'tree' => $this->tree,
+            'echo' => $echo,
+        ]);
+
         $menu = sprintf(
             '<nav class="%1$s" %2$s>%3$s</nav>',
-            $this->topClass,
-            $this->attrs($this->menuAttr),
-            $this->sprout($this->tree)
+            $topData['class'],
+            $topData['attrs'],
+            $this->sprout($topData['tree'])
         );
 
-        if ($echo) {
+        if ($topData['echo']) {
             echo $menu;
         } else {
             return $menu;
