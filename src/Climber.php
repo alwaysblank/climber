@@ -10,6 +10,13 @@ class Climber
       'tree',
       'ID'
     ];
+    protected $hookable = [
+        'top',
+        'menu',
+        'item',
+        'link',
+        'final',
+    ];
 
     protected $ID;
     protected $tree = [];
@@ -22,6 +29,11 @@ class Climber
     protected $menuAttr = [];
     protected $itemAttr = [];
     protected $linkAttr = [];
+    protected $topHooks = [];
+    protected $menuHooks = [];
+    protected $itemHooks = [];
+    protected $linkHooks = [];
+    protected $finalHooks = [];
 
     public function __construct($menuID)
     {
@@ -42,7 +54,7 @@ class Climber
    */
     public function __toString()
     {
-        return $this->element($this->tree);
+        return $this->element();
     }
 
   /**
@@ -131,6 +143,53 @@ class Climber
         return null;
     }
 
+    /**
+     * Hook up a callback to a processing step.
+     *
+     * Ultimately callbacks are run through `call_user_func()`, so you
+     * can pass anything to $callback that would be accepted as an
+     * argument for `call_user_func()`.
+     *
+     * @param string $location
+     * @param mixed $callback
+     * @param int|boolean $order
+     * @return void
+     */
+    public function hook(string $location, $callback, $order = false)
+    {
+        $propName = sprintf("%sHooks", $location);
+        if (property_exists($this, $propName)) {
+            if ($order === false) {
+                return $this->{$propName}[] = $callback;
+            } else {
+                return $this->{$propName}[(int) $order] = $callback;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Run all hooks attached to a particular location.
+     *
+     * $data can be any type of data, but will usually be an array.
+     *
+     * @param string $location
+     * @param mixed $data
+     * @return mixed
+     */
+    protected function runHook(string $location, $data)
+    {
+        $propName = sprintf("%sHooks", $location);
+        if (property_exists($this, $propName) && count($this->{$propName}) > 0) {
+            foreach ($this->{$propName} as $callback) {
+                $data = call_user_func($callback, $data);
+            }
+        }
+
+        return $data;
+    }
+
   /**
    * Add children to items.
    *
@@ -142,7 +201,9 @@ class Climber
    */
     protected function plant(array $seed)
     {
-        return array_map(function ($item) use ($seed) {
+        $return = [];
+
+        foreach ($seed as $id => $item) {
             // Get menu items from $seed that are children of the current item.
             $item->children = array_filter($seed, function ($child) use ($item) {
                 return (string) $item->ID === (string) $child->menu_item_parent;
@@ -156,8 +217,23 @@ class Climber
                 return ($a->menu_order < $b->menu_order) ? -1 : 1;
             });
 
-            return $item;
-        }, $seed);
+            // Add this item to the array we'll eventually return.
+            $return[] = $item;
+
+                /** PERFORMANCE
+                 * On large menus this loop could get really long so, lets clean
+                 * things up a bit.
+                 *
+                 * Filter out all the children we just added; we know who's children
+                 * they are now, so we don't need to iterate through them in the
+                 * future.
+                 */
+                $seed = array_filter($seed, function ($child) use ($item) {
+                    return (string) $item->ID !== (string) $child->menu_item_parent;
+                });
+        }
+
+        return $return;
     }
 
   /**
@@ -190,16 +266,30 @@ class Climber
    */
     protected function leaf(\WP_Post $leaf, $level = 0)
     {
+        $itemData = $this->runHook('item', [
+            'class' => $this->itemClass,
+            'attrs' => $this->attrs($this->itemAttr),
+            'leaf' => $leaf,
+        ]);
+
+        $linkData = $this->runHook('link', [
+            'link' => get_permalink($leaf->object_id),
+            'class' => $this->linkClass,
+            'attrs' => $this->attrs($this->linkAttr),
+            'text' => $leaf->title,
+            'leaf' => $leaf,
+        ]);
+
         return sprintf(
             '<li class="%1$s" %2$s>%3$s%4$s</li>',
-            $this->itemClass,
-            $this->attrs($this->itemAttr),
+            $itemData['class'],
+            $itemData['attrs'],
             sprintf(
                 '<a href="%1$s" class="%2$s" %3$s>%4$s</a>',
-                get_permalink($leaf->object_id),
-                $this->linkClass,
-                $this->attrs($this->linkAttr),
-                $leaf->title
+                $linkData['link'],
+                $linkData['class'],
+                $linkData['attrs'],
+                $linkData['text']
             ),
             count($leaf->children) > 0
             ? $this->sprout($leaf->children, $level)
@@ -207,7 +297,18 @@ class Climber
         );
     }
 
-    protected function sprout($children, $level = 0)
+    /**
+     * Sprouts a new branch.
+     *
+     * This created a new menu (or, more often, a submenu). $level reflects
+     * how 'deep' in the menu we are. The very top level is 0; the next level
+     * of submenus is 1, etc.
+     *
+     * @param array $children
+     * @param integer $level
+     * @return string
+     */
+    protected function sprout(array $children, $level = 0)
     {
         return sprintf(
             '<ul class="%1$s level-%2$s" %3$s>%4$s</ul>',
@@ -225,17 +326,16 @@ class Climber
     /**
      * Return (or optionally echo) the full HTML for the menu.
      *
-     * @param array $tree
      * @param boolean $echo
      * @return string
      */
-    public function element(array $tree, $echo = false)
+    public function element($echo = false)
     {
         $menu = sprintf(
             '<nav class="%1$s" %2$s>%3$s</nav>',
             $this->topClass,
             $this->attrs($this->menuAttr),
-            $this->sprout($tree)
+            $this->sprout($this->tree)
         );
 
         if ($echo) {
