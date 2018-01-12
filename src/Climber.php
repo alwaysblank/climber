@@ -77,7 +77,7 @@ class Climber
     public function __get(string $property)
     {
         if (property_exists($this, $property)) {
-            return $this->{$property};
+            return $this->$property;
         }
 
         return null;
@@ -449,7 +449,7 @@ class Climber
     {
         $topData = $this->runHook('top', [
             'class' => $this->topClass,
-            'attrs' => $this->attrs($this->menuAttr),
+            'attrs' => $this->attrs($this->topAttr),
             'tree' => $this->tree,
             'echo' => $echo,
         ]);
