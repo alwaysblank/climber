@@ -8,6 +8,14 @@ class Climber
 {
     protected $setable = [
       'tree',
+      'topClass',
+      'menuClass',
+      'itemClass',
+      'linkClass',
+      'topAttr',
+      'menuAttr',
+      'itemAttr',
+      'linkAttr',
     ];
     protected $hookable = [
         'top',
@@ -90,16 +98,74 @@ class Climber
    */
     public function __set(string $property, $value = null)
     {
-        if (isset($this->setable[$property])) {
+        if (in_array($property, $this->setable)) {
             $setMethod = sprintf("set%s", ucfirst($property));
             if (method_exists($this, $setMethod)) {
-                $value = call_user_func([$this, $setMethod], $value);
+                $value = call_user_func([$this, $setMethod], $value, $property);
             }
 
-            return $this->{$property} = $value;
+            $this->$property = $value;
+            $this->nursery($this->seed);
+
+            return $this->$property;
         }
 
         return null;
+    }
+
+    /**
+     * Safely return a value for $property with $value
+     * appended to the end of the array.
+     * 
+     * @param mixed $value
+     * @param string $property
+     * @return array
+     */
+    protected function appendArrayProp($value, string $property)
+    {
+        $temp = $this->$property;
+        array_push($temp, $value);
+        return $temp;
+    }
+
+    /**
+     * Set $this->topAttr.
+     * 
+     * @see Livy\Climber\Climber::appendArrayProp()
+     */
+    public function setTopAttr($value, $property) 
+    {
+        return $this->appendArrayProp($value, $property);
+    }
+
+    /**
+     * Set $this->menuAttr.
+     * 
+     * @see Livy\Climber\Climber::appendArrayProp()
+     */
+    public function setMenuAttr($value, $property) 
+    {
+        return $this->appendArrayProp($value, $property);
+    }
+
+    /**
+     * Set $this->itemAttr.
+     * 
+     * @see Livy\Climber\Climber::appendArrayProp()
+     */
+    public function setItemAttr($value, $property) 
+    {
+        return $this->appendArrayProp($value, $property);
+    }
+
+    /**
+     * Set $this->linkAttr.
+     * 
+     * @see Livy\Climber\Climber::appendArrayProp()
+     */
+    public function setLinkAttr($value, $property) 
+    {
+        return $this->appendArrayProp($value, $property);
     }
 
   /**
