@@ -224,15 +224,15 @@ class Climber
      * As currently written, the non-`get_permalink()` url is not intended
      * to be *at all* functional—it is only there so something is returned.
      *
-     * @param \WP_Post $leaf
+     * @param int $id
      * @return void
      */
-    protected function url(\WP_Post $leaf)
+    protected function url(int $id)
     {
         if (function_exists('get_permalink')) {
-            return get_permalink($leaf->object_id);
+            return get_permalink($id);
         } else {
-            return '/' . Z\Strings::clean($leaf->title, '-');
+            return '/' . $id;
         }
     }
 
@@ -382,7 +382,7 @@ class Climber
         ]);
 
         $linkData = $this->runHook('link', [
-            'link' => get_permalink($leaf->object_id),
+            'link' => $this->url($leaf->object_id),
             'class' => $this->linkClass,
             'attrs' => $this->attrs($this->linkAttr),
             'text' => $leaf->title,
