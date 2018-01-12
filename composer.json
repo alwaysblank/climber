@@ -15,7 +15,7 @@
     "require-dev": {
       "zenodorus/core": "dev-master",
       "phpunit/phpunit": "^6.4",
-      "squizlabs/php_codesniffer": "^3.1"
+      "squizlabs/php_codesniffer": "^3.2"
 
     },
     "autoload": {
@@ -26,6 +26,6 @@
     "scripts": {
       "check": ["phpcs --standard=vendor/zenodorus/core/phpcs.xml src tests"],
       "fix": ["phpcbf --standard=vendor/zenodorus/core/phpcs.xml src tests"],
-      "test": ["phpunit"]
+      "test": ["./vendor/bin/phpunit"]
     }
 }

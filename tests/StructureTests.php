@@ -1,8 +1,10 @@
-<?php namespace Livy\Climber;
+<?php // phpcs:disable PSR1.Files.SideEffects.FoundWithSymbols
+namespace Livy\Climber;
 
 use \PHPUnit\Framework\TestCase;
 
 include_once 'shims.php';
+// phpcs:enable
 
 class StructureTest extends TestCase
 {

@@ -1,6 +1,9 @@
-<?php 
+<?php
+// phpcs:disable PSR1.Classes.ClassDeclaration.MissingNamespace, Squiz.Classes.ValidClassName.NotCamelCaps
 
-class WP_Post {
+class WP_Post
+// phpcs:enable
+{
 
     public $ID;
     public $title;

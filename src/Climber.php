@@ -118,7 +118,7 @@ class Climber
     /**
      * Safely return a value for $property with $value
      * appended to the end of the array.
-     * 
+     *
      * @param mixed $value
      * @param string $property
      * @return array
@@ -132,40 +132,40 @@ class Climber
 
     /**
      * Set $this->topAttr.
-     * 
+     *
      * @see Livy\Climber\Climber::appendArrayProp()
      */
-    public function setTopAttr($value, $property) 
+    public function setTopAttr($value, $property)
     {
         return $this->appendArrayProp($value, $property);
     }
 
     /**
      * Set $this->menuAttr.
-     * 
+     *
      * @see Livy\Climber\Climber::appendArrayProp()
      */
-    public function setMenuAttr($value, $property) 
+    public function setMenuAttr($value, $property)
     {
         return $this->appendArrayProp($value, $property);
     }
 
     /**
      * Set $this->itemAttr.
-     * 
+     *
      * @see Livy\Climber\Climber::appendArrayProp()
      */
-    public function setItemAttr($value, $property) 
+    public function setItemAttr($value, $property)
     {
         return $this->appendArrayProp($value, $property);
     }
 
     /**
      * Set $this->linkAttr.
-     * 
+     *
      * @see Livy\Climber\Climber::appendArrayProp()
      */
-    public function setLinkAttr($value, $property) 
+    public function setLinkAttr($value, $property)
     {
         return $this->appendArrayProp($value, $property);
     }

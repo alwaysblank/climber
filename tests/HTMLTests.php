@@ -1,8 +1,10 @@
-<?php namespace Livy\Climber;
+<?php // phpcs:disable PSR1.Files.SideEffects.FoundWithSymbols
+namespace Livy\Climber;
 
 use \PHPUnit\Framework\TestCase;
 
 include_once 'shims.php';
+// phpcs:enable
 
 class HTMLTest extends TestCase
 {
@@ -63,7 +65,9 @@ class HTMLTest extends TestCase
     
     public function testBasicMenu()
     {
+        // phpcs:disable Generic.Files.LineLength.TooLong
         $expected = '<nav class="simpleMenu" ><ul class="simpleMenu__menu level-0" ><li class="simpleMenu__item" ><a href="/111" class="simpleMenu__link" >Oregon</a><ul class="simpleMenu__menu simpleMenu__menu--submenu level-1" ><li class="simpleMenu__item" ><a href="/333" class="simpleMenu__link" >Portland</a></li><li class="simpleMenu__item" ><a href="/444" class="simpleMenu__link" >Corvallis</a><ul class="simpleMenu__menu simpleMenu__menu--submenu level-2" ><li class="simpleMenu__item" ><a href="/555" class="simpleMenu__link" >OSU</a></li></ul></li></ul></li><li class="simpleMenu__item" ><a href="/222" class="simpleMenu__link" >California</a></li><li class="simpleMenu__item" ><a href="/666" class="simpleMenu__link" >Iowa</a></li></ul></nav>';
+        // phpcs:enable
         
         $test = new Climber($this->source);
         $this->assertEquals($expected, $test->element(), "Simple menu HTML does not match.");
@@ -116,25 +120,25 @@ class HTMLTest extends TestCase
     {
         $test = new Climber($this->source);
 
-        $test->hook('top', function($nav) {
+        $test->hook('top', function ($nav) {
             $nav['class'] = $nav['class'] . ' topHooked';
             return $nav;
         });
         $this->assertNotFalse(strpos($test->element(), ' topHooked'), 'Cannot hook "top".');
 
-        $test->hook('menu', function($nav) {
+        $test->hook('menu', function ($nav) {
             $nav['class'] = $nav['class'] . ' menuHooked';
             return $nav;
         });
         $this->assertNotFalse(strpos($test->element(), ' menuHooked'), 'Cannot hook "menu".');
 
-        $test->hook('item', function($nav) {
+        $test->hook('item', function ($nav) {
             $nav['class'] = $nav['class'] . ' itemHooked';
             return $nav;
         });
         $this->assertNotFalse(strpos($test->element(), ' itemHooked'), 'Cannot hook "item".');
 
-        $test->hook('link', function($nav) {
+        $test->hook('link', function ($nav) {
             $nav['class'] = $nav['class'] . ' linkHooked';
             return $nav;
         });
