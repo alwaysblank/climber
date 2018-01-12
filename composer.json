@@ -13,7 +13,10 @@
       "zenodorus/strings": "^1.0"
     },
     "require-dev": {
-      "zenodorus/core": "dev-master"
+      "zenodorus/core": "dev-master",
+      "phpunit/phpunit": "^6.4",
+      "squizlabs/php_codesniffer": "^3.1"
+
     },
     "autoload": {
         "psr-4": {
