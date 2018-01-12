@@ -24,6 +24,7 @@ class Climber
         'link',
     ];
 
+    protected $seed;
     protected $tree = [];
 
     protected $topClass = 'simpleMenu';
@@ -52,7 +53,8 @@ class Climber
     public function __construct($seed)
     {
         if (is_array($seed)) {
-            $this->nursery($seed);
+            $this->seed = $seed;
+            $this->nursery($this->seed);
         }
     }
 
