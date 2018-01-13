@@ -9,6 +9,7 @@ class WP_Post
     public $title;
     public $menu_item_parent;
     public $menu_order;
+    public $object_id;
 
     public function __construct($args)
     {

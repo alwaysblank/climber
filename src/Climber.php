@@ -17,6 +17,13 @@ class Climber
       'itemAttr',
       'linkAttr',
     ];
+    public static $expected = [
+        'ID',
+        'menu_item_parent',
+        'menu_order',
+        'object_id',
+        'title',
+    ];
     protected $hookable = [
         'top',
         'menu',
