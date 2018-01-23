@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "f0704c684b34f6d059d0101376b946c6",
+    "content-hash": "c74cec0fc489da9809ccf1a7379d014c",
     "packages": [
         {
             "name": "zenodorus/arrays",
-            "version": "1.0",
+            "version": "1.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zenodorus-tools/arrays.git",
-                "reference": "fde312406ceaf86bda5519d1e8911c1afb031d54"
+                "reference": "c089f9400c7c5573570a52effa56b35d98ce68be"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zenodorus-tools/arrays/zipball/fde312406ceaf86bda5519d1e8911c1afb031d54",
-                "reference": "fde312406ceaf86bda5519d1e8911c1afb031d54",
+                "url": "https://api.github.com/repos/zenodorus-tools/arrays/zipball/c089f9400c7c5573570a52effa56b35d98ce68be",
+                "reference": "c089f9400c7c5573570a52effa56b35d98ce68be",
                 "shasum": ""
             },
             "require": {
@@ -47,7 +47,7 @@
             ],
             "description": "Tools for messing with arrays.",
             "homepage": "https://zenodor.us",
-            "time": "2017-10-25T18:09:23+00:00"
+            "time": "2018-01-22T23:45:52+00:00"
         },
         {
             "name": "zenodorus/strings",
@@ -944,16 +944,16 @@
         },
         {
             "name": "sebastian/comparator",
-            "version": "2.1.1",
+            "version": "2.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/comparator.git",
-                "reference": "b11c729f95109b56a0fe9650c6a63a0fcd8c439f"
+                "reference": "11c07feade1d65453e06df3b3b90171d6d982087"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/comparator/zipball/b11c729f95109b56a0fe9650c6a63a0fcd8c439f",
-                "reference": "b11c729f95109b56a0fe9650c6a63a0fcd8c439f",
+                "url": "https://api.github.com/repos/sebastianbergmann/comparator/zipball/11c07feade1d65453e06df3b3b90171d6d982087",
+                "reference": "11c07feade1d65453e06df3b3b90171d6d982087",
                 "shasum": ""
             },
             "require": {
@@ -1004,7 +1004,7 @@
                 "compare",
                 "equality"
             ],
-            "time": "2017-12-22T14:50:35+00:00"
+            "time": "2018-01-12T06:34:42+00:00"
         },
         {
             "name": "sebastian/diff",

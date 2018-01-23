@@ -48,21 +48,13 @@ class Climber
     protected $linkHooks = [];
 
     /**
-     * Class constructor.
+     * All this does is set the tree.
      *
-     * This expects to be given an array that is either the result of
-     * `wp_get_nav_menu_items()` or as the same structure.
-     *
-     * The tree can be planted later with a call to the `nursery()` method.
-     *
-     * @param array $seed
+     * @param Tree $tree
      */
-    public function __construct($seed)
+    public function __construct(Tree $tree)
     {
-        if (is_array($seed)) {
-            $this->seed = $seed;
-            $this->nursery($this->seed);
-        }
+        $this->tree = $tree;
     }
 
   /**
@@ -291,148 +283,102 @@ class Climber
     }
 
     /**
-     * Plants the tree.
+     * Returns some data about the leaf in a 
+     * slightly more accessible format.
      *
-     * This expects to be given an array that is either the result of
-     * `wp_get_nav_menu_items()` or as the same structure.
-     *
-     * @param array $seed
+     * @param array $leaf
      * @return void
      */
-    public function nursery(array $seed)
+    protected function examine(array $leaf)
     {
-        $this->tree = $this->prune(
-            $this->plant($seed)
+        return (object) array_merge(
+            [
+                'parent' => $leaf[0] ?? false,
+                'children' => $leaf[1] ?? false,
+            ],
+            $leaf[2]
+        );
+    }
+    
+    protected function bud(int $hint)
+    {
+        $bud = $this->tree->getLeaf($hint);
+
+        $itemData = $this->runHook('item', [
+            'class' => $this->itemClass,
+            'attrs' => $this->attrs($this->itemAttr),
+            'bud' => $bud,
+        ]);
+
+        $itemOutput = $this->runHook('itemOutput', [
+            'format' => '%1$s%2$s',
+            'args' => [
+                $this->fruit($bud),
+                $this->branch($bud),
+            ],
+        ]);
+
+        return vsprintf(
+            sprintf(
+                '<li class="%1$s" %2$s>%3$s</li>',
+                $itemData['class'],
+                $itemData['attrs'],
+                $itemOutput['format']
+            ),
+            $itemOutput['args']
         );
     }
 
   /**
-   * Add children to items.
+   * Sprout a link.
    *
-   * This iterates through all items and adds each items children
-   * to it by creating a `child` property.
-   *
-   * @param array $seed
-   * @return array
-   */
-    protected function plant(array $seed)
-    {
-        $return = [];
-
-        foreach ($seed as $id => $item) {
-            // Get menu items from $seed that are children of the current item.
-            $item->children = array_filter($seed, function ($child) use ($item) {
-                return (string) $item->ID === (string) $child->menu_item_parent;
-            });
-
-            // Make sure children are sorted by menu_order.
-            usort($item->children, function ($a, $b) {
-                if ($a->menu_order == $b->menu_order) {
-                    return 0;
-                }
-                return ($a->menu_order < $b->menu_order) ? -1 : 1;
-            });
-
-            // Add this item to the array we'll eventually return.
-            $return[] = $item;
-
-                /** PERFORMANCE
-                 * On large menus this loop could get really long so, lets clean
-                 * things up a bit.
-                 *
-                 * Filter out all the children we just added; we know who's children
-                 * they are now, so we don't need to iterate through them in the
-                 * future.
-                 */
-                $seed = array_filter($seed, function ($child) use ($item) {
-                    return (string) $item->ID !== (string) $child->menu_item_parent;
-                });
-        }
-
-        return $return;
-    }
-
-  /**
-   * Remove children from top level.
-   *
-   * Once children have been added to their parents, they should no longer
-   * appear in the top-level array, or we won't be able to iterate over it
-   * properly. This removes them with a simple filter.
-   *
-   * @param array $planted
-   * @return array
-   */
-    protected function prune($planted)
-    {
-        return array_filter($planted, function ($leaf) {
-            return (int) $leaf->menu_item_parent === 0;
-        });
-    }
-
-  /**
-   * Process a leaf and possibly sprout branches.
-   *
-   * This generates HTML for an individual <li> in the menu. If this
-   * leaf has children, then it calls `$this->sprout()` to create a
-   * <ul> container all the children.
-   *
-   * @param [type] $leaf
-   * @param integer $level
+   * @param array $bud
    * @return void
    */
-    protected function leaf(\WP_Post $leaf, $level = 0)
+    protected function fruit(array $bud)
     {
-        $itemData = $this->runHook('item', [
-            'class' => $this->itemClass,
-            'attrs' => $this->attrs($this->itemAttr),
-            'leaf' => $leaf,
-        ]);
-
         $linkData = $this->runHook('link', [
-            'link' => $this->url($leaf->object_id),
+            'link' => $this->url(Z\Arrays::pluck($bud, [2, 'target'])),
             'class' => $this->linkClass,
             'attrs' => $this->attrs($this->linkAttr),
-            'text' => $leaf->title,
-            'leaf' => $leaf,
+            'text' => Z\Arrays::pluck($bud, [2, 'name']),
         ]);
 
         return sprintf(
-            '<li class="%1$s" %2$s>%3$s%4$s</li>',
-            $itemData['class'],
-            $itemData['attrs'],
-            sprintf(
-                '<a href="%1$s" class="%2$s" %3$s>%4$s</a>',
-                $linkData['link'],
-                $linkData['class'],
-                $linkData['attrs'],
-                $linkData['text']
-            ),
-            count($leaf->children) > 0
-            ? $this->sprout($leaf->children, $level)
-            : null
+            '<a href="%1$s" class="%2$s" %3$s>%4$s</a>',
+            $linkData['link'],
+            $linkData['class'],
+            $linkData['attrs'],
+            $linkData['text']
         );
     }
 
     /**
-     * Sprouts a new branch.
+     * Branch out a submenu.
      *
-     * This creates a new menu (or, more often, a submenu). $level reflects
-     * how 'deep' in the menu we are. The very top level is 0; the next level
-     * of submenus is 1, etc.
-     *
-     * @param array $children
-     * @param integer $level
+     * @param array $bud
      * @return string
      */
-    protected function sprout(array $children, $level = 0)
+    protected function branch(array $bud)
     {
+        // If this bud has no children, there is no branch.
+        if (empty($bud[1])) {
+            return null;
+        }
+
+        $id = Z\Arrays::pluck($bud, [2, 'id'], true);
+        // Buds return a path length 1 less than their actual level
+        // (because their 'actual' level has to do with the depth of
+        // their children), so we need to manually increase the value.
+        $level = $id ? count($this->tree->getLeafPath($id)) + 1 : 0;
+
         $menuData = $this->runHook('menu', [
             'class' => $level > 0
                 ? sprintf('%1$s %1$s--submenu', $this->menuClass)
                 : $this->menuClass,
             'level' => $level,
             'attrs' => $this->attrs($this->menuAttr),
-            'children' => $children,
+            'bud' => $bud,
         ]);
 
         return sprintf(
@@ -440,11 +386,30 @@ class Climber
             $menuData['class'],
             $menuData['level'],
             $menuData['attrs'],
-            array_reduce($menuData['children'], function ($carry, $child) use ($level) {
-                return $carry . $this->leaf($child, $level + 1);
-            })
+            join('', array_filter(array_map([$this, 'bud'], $bud[1])))
         );
     }
+
+    /**
+     * Convert the tree into something we can pass to Climber::branch().
+     * 
+     * All it does is trip out items from the $tree that have no parents (since
+     * all top-level items have no parents).
+     *
+     * @param array $tree
+     * @return string
+     */
+    protected function harvest(array $tree)
+    {
+        return [
+            0 => null,
+            1 => array_keys(array_filter($tree, function($leaf) {
+                return $leaf[0] === null;
+            })),
+        ];
+    }
+
+
 
     /**
      * Return (or optionally echo) the full HTML for the menu.
@@ -457,7 +422,7 @@ class Climber
         $topData = $this->runHook('top', [
             'class' => $this->topClass,
             'attrs' => $this->attrs($this->topAttr),
-            'tree' => $this->tree,
+            'tree' => $this->tree->grow(),
             'echo' => $echo,
         ]);
 
@@ -465,7 +430,7 @@ class Climber
             '<nav class="%1$s" %2$s>%3$s</nav>',
             $topData['class'],
             $topData['attrs'],
-            $this->sprout($topData['tree'])
+            $this->branch($this->harvest($topData['tree']))
         );
 
         if ($topData['echo']) {

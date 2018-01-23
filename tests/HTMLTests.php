@@ -56,11 +56,15 @@ class HTMLTest extends TestCase
                 'menu_order' => 6,
             ]),
         ];
+
+        $this->tree = new Tree(new Spotter\WordPress($this->source));
+        $this->test = new Climber($this->tree);
     }
 
     public function testShims()
     {
-        $this->assertTrue(is_array($this->source), 'Menu is not an array.');
+        $this->assertInstanceOf(Tree::class, $this->tree, "The source is not a valid Tree.");
+        $this->assertInstanceOf(Climber::class, $this->test, "The test item is not a valid Climber.");
     }
     
     public function testBasicMenu()
@@ -68,9 +72,8 @@ class HTMLTest extends TestCase
         // phpcs:disable Generic.Files.LineLength.TooLong
         $expected = '<nav class="simpleMenu" ><ul class="simpleMenu__menu level-0" ><li class="simpleMenu__item" ><a href="/111" class="simpleMenu__link" >Oregon</a><ul class="simpleMenu__menu simpleMenu__menu--submenu level-1" ><li class="simpleMenu__item" ><a href="/333" class="simpleMenu__link" >Portland</a></li><li class="simpleMenu__item" ><a href="/444" class="simpleMenu__link" >Corvallis</a><ul class="simpleMenu__menu simpleMenu__menu--submenu level-2" ><li class="simpleMenu__item" ><a href="/555" class="simpleMenu__link" >OSU</a></li></ul></li></ul></li><li class="simpleMenu__item" ><a href="/222" class="simpleMenu__link" >California</a></li><li class="simpleMenu__item" ><a href="/666" class="simpleMenu__link" >Iowa</a></li></ul></nav>';
         // phpcs:enable
-        
-        $test = new Climber($this->source);
-        $this->assertEquals($expected, $test->element(), "Simple menu HTML does not match.");
+
+        $this->assertEquals($expected, $this->test->element(), "Simple menu HTML does not match.");
     }
 
     /**
@@ -78,19 +81,17 @@ class HTMLTest extends TestCase
      */
     public function testSetClass()
     {
-        $test = new Climber($this->source);
+        $this->test->topClass = "{$this->test->topClass} newTop";
+        $this->assertNotFalse(strpos($this->test->element(), "newTop"), 'Cannot set `$topClass`.');
 
-        $test->topClass = "$test->topClass newTop";
-        $this->assertNotFalse(strpos($test->element(), "newTop"), 'Cannot set `$topClass`.');
+        $this->test->menuClass = "{$this->test->menuClass} newMenu";
+        $this->assertNotFalse(strpos($this->test->element(), "newMenu"), 'Cannot set `$menuClass`.');
 
-        $test->menuClass = "$test->menuClass newMenu";
-        $this->assertNotFalse(strpos($test->element(), "newMenu"), 'Cannot set `$menuClass`.');
+        $this->test->itemClass = "{$this->test->itemClass} newItem";
+        $this->assertNotFalse(strpos($this->test->element(), "newItem"), 'Cannot set `$itemClass`.');
 
-        $test->itemClass = "$test->itemClass newItem";
-        $this->assertNotFalse(strpos($test->element(), "newItem"), 'Cannot set `$itemClass`.');
-
-        $test->linkClass = "$test->linkClass newLink";
-        $this->assertNotFalse(strpos($test->element(), "newLink"), 'Cannot set `$linkClass`.');
+        $this->test->linkClass = "{$this->test->linkClass} newLink";
+        $this->assertNotFalse(strpos($this->test->element(), "newLink"), 'Cannot set `$linkClass`.');
     }
 
     /**
@@ -98,19 +99,17 @@ class HTMLTest extends TestCase
      */
     public function testSetAttrs()
     {
-        $test = new Climber($this->source);
+        $this->test->topAttr = ['data-top', 'new top'];
+        $this->assertNotFalse(strpos($this->test->element(), 'data-top="new top"'), 'Cannot set `$topAttr`.');
 
-        $test->topAttr = ['data-top', 'new top'];
-        $this->assertNotFalse(strpos($test->element(), 'data-top="new top"'), 'Cannot set `$topAttr`.');
+        $this->test->menuAttr = ['data-menu', 'new menu'];
+        $this->assertNotFalse(strpos($this->test->element(), 'data-menu="new menu"'), 'Cannot set `$menuAttr`.');
 
-        $test->menuAttr = ['data-menu', 'new menu'];
-        $this->assertNotFalse(strpos($test->element(), 'data-menu="new menu"'), 'Cannot set `$menuAttr`.');
+        $this->test->itemAttr = ['data-item', 'new item'];
+        $this->assertNotFalse(strpos($this->test->element(), 'data-item="new item"'), 'Cannot set `$itemAttr`.');
 
-        $test->itemAttr = ['data-item', 'new item'];
-        $this->assertNotFalse(strpos($test->element(), 'data-item="new item"'), 'Cannot set `$itemAttr`.');
-
-        $test->linkAttr = ['data-link', 'new link'];
-        $this->assertNotFalse(strpos($test->element(), 'data-link="new link"'), 'Cannot set `$linkAttr`.');
+        $this->test->linkAttr = ['data-link', 'new link'];
+        $this->assertNotFalse(strpos($this->test->element(), 'data-link="new link"'), 'Cannot set `$linkAttr`.');
     }
 
     /**
@@ -118,30 +117,28 @@ class HTMLTest extends TestCase
      */
     public function testSetHooks()
     {
-        $test = new Climber($this->source);
-
-        $test->hook('top', function ($nav) {
+        $this->test->hook('top', function ($nav) {
             $nav['class'] = $nav['class'] . ' topHooked';
             return $nav;
         });
-        $this->assertNotFalse(strpos($test->element(), ' topHooked'), 'Cannot hook "top".');
+        $this->assertNotFalse(strpos($this->test->element(), ' topHooked'), 'Cannot hook "top".');
 
-        $test->hook('menu', function ($nav) {
+        $this->test->hook('menu', function ($nav) {
             $nav['class'] = $nav['class'] . ' menuHooked';
             return $nav;
         });
-        $this->assertNotFalse(strpos($test->element(), ' menuHooked'), 'Cannot hook "menu".');
+        $this->assertNotFalse(strpos($this->test->element(), ' menuHooked'), 'Cannot hook "menu".');
 
-        $test->hook('item', function ($nav) {
+        $this->test->hook('item', function ($nav) {
             $nav['class'] = $nav['class'] . ' itemHooked';
             return $nav;
         });
-        $this->assertNotFalse(strpos($test->element(), ' itemHooked'), 'Cannot hook "item".');
+        $this->assertNotFalse(strpos($this->test->element(), ' itemHooked'), 'Cannot hook "item".');
 
-        $test->hook('link', function ($nav) {
+        $this->test->hook('link', function ($nav) {
             $nav['class'] = $nav['class'] . ' linkHooked';
             return $nav;
         });
-        $this->assertNotFalse(strpos($test->element(), ' linkHooked'), 'Cannot hook "link".');
+        $this->assertNotFalse(strpos($this->test->element(), ' linkHooked'), 'Cannot hook "link".');
     }
 }
