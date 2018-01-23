@@ -133,30 +133,45 @@ class Tree
      * Get data from within a leaf.
      * 
      * The point of this is to avoid having to do ugly stuff like
-     * `$this->getLeaf(2)[1]`.
+     * `$this->getLeaf(2)[1]['order']`.
+     * 
+     * Passing $data allows you to
      *
      * @param integer $id
+     * @param int|string $slot
      * @param int|string $data
      * @return mixed
      */
-    public function getLeafContent(int $id, $data)
+    public function getLeafContent(int $id, $slot, $data = null)
     {
+        // Only allow certain terms to be converted.
         $allowed_terms = [
             'parent' => 0,
             'children' => 1,
-            'data' => 3,
+            'data' => 2,
         ];
 
-        if (isset($allowed_terms[$data])) {
-            $query = (int) $allowed_terms[$data];
+        // Build a query from valid terms.
+        if (isset($allowed_terms[$slot])) {
+            $query = (int) $allowed_terms[$slot];
         } else {
-            $query = (int) $data;
+            $query = (int) $slot;
+        }
+
+        // Make sure $data is valid.
+        if ((null !== $data && !(is_string($data) || is_int($data)))
+            || (null !== $data && 2 !== $query)) {
+            $data = null;
         }
 
         $leaf = $this->getLeaf($id);
 
-        if ($leaf && isset($leaf[$query])) {
-            return $leaf[$query];
+        if ($leaf) {
+            if (null !== $data && isset($leaf[$query][$data])) {
+                return $leaf[$query][$data];
+            } elseif (null === $data && isset($leaf[$query])) {
+                return $leaf[$query];
+            }
         }
 
         return null;

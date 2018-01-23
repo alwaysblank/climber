@@ -28,6 +28,31 @@ class TreeTest extends TestCase
         $this->assertEquals('Portland', $test[44][2]['name']);
     }
 
+    public function testGetLeaf()
+    {
+        $valid = [
+            null,
+            [],
+            [
+                'id' => 33,
+                'parent' => null,
+                'order' => 1,
+                'target' => 'https://california.gov',
+                'name' => 'California',
+            ]
+        ];
+        $this->assertEquals($this->test->getLeaf(33), $valid);
+    }
+
+    public function testGetLeafContent()
+    {
+        $this->assertEquals([], $this->test->getLeafContent(33, 1));
+        $this->assertEquals(1, $this->test->getLeafContent(33, 'data', 'order'));
+        $this->assertNull($this->test->getLeafContent(33, 5));
+        $this->assertNull($this->test->getLeafContent(33, 'data', 'nothing'));
+        $this->assertNull($this->test->getLeafContent(33, 'chilren', 'nothing'));
+    }
+
     public function testChildrenPath()
     {
         $this->assertEquals([22, 55], $this->test->getLeafPath(66));

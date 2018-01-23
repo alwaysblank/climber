@@ -340,6 +340,17 @@ class Climber
         // their children), so we need to manually increase the value.
         $level = $id ? count($this->tree->getLeafPath($id)) + 1 : 0;
 
+        // Make sure children are properly sorted.
+        usort($bud[1], function ($a, $b) {
+            $a_order = $this->tree->getLeafContent($a, 'data', 'order');
+            $b_order = $this->tree->getLeafContent($b, 'data', 'order');
+
+            if ($a_order == $b_order) {
+                return 0;
+            }
+            return ($a_order < $b_order) ? -1 : 1;
+        });
+        
         $menuData = $this->runHook('menu', [
             'class' => $level > 0
                 ? sprintf('%1$s %1$s--submenu', $this->menuClass)

@@ -31,14 +31,14 @@ class WP_Data
                 'url' => 'https://oregon.gov',
                 'title' => "Oregon",
                 'menu_item_parent' => 0,
-                'menu_order' => 1,
+                'menu_order' => 2,
             ]),
             1 => new \WP_Post([
                 'ID' => 33,
                 'url' => 'https://california.gov',
                 'title' => "California",
                 'menu_item_parent' => 0,
-                'menu_order' => 2,
+                'menu_order' => 1,
             ]),
             2 => new \WP_Post([
                 'ID' => 44,
