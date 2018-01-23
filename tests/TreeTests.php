@@ -12,57 +12,12 @@ class TreeTest extends TestCase
 
     protected function setUp()
     {
-        $this->source = [
-            0 => new \WP_Post([
-              'ID' => 22,
-              'object_id' => 111,
-              'title' => "Oregon",
-              'menu_item_parent' => 0,
-              'menu_order' => 1,
-            ]),
-            1 => new \WP_Post([
-              'ID' => 33,
-              'object_id' => 222,
-              'title' => "California",
-              'menu_item_parent' => 0,
-              'menu_order' => 2,
-            ]),
-            2 => new \WP_Post([
-              'ID' => 44,
-              'object_id' => 333,
-              'title' => "Portland",
-              'menu_item_parent' => 22,
-              'menu_order' => 3,
-            ]),
-            3 => new \WP_Post([
-              'ID' => 55,
-              'object_id' => 444,
-              'title' => "Corvallis",
-              'menu_item_parent' => 22,
-              'menu_order' => 4,
-            ]),
-            4 => new \WP_Post([
-              'ID' => 66,
-              'object_id' => 555,
-              'title' => "OSU",
-              'menu_item_parent' => 55,
-              'menu_order' => 5,
-            ]),
-            5 => new \WP_Post([
-              'ID' => 77,
-              'object_id' => 666,
-              'title' => "Iowa",
-              'menu_item_parent' => 0,
-              'menu_order' => 6,
-            ]),
-        ];
-
-        $this->test = new Tree(new Spotter\WordPress($this->source));
+        $this->test = new Tree(new Spotter\WordPress(\WP_Data::get()));
     }
 
     public function testShims()
     {
-        $this->assertTrue(is_array($this->source), 'Menu is not an array.');
+        $this->assertInstanceOf(Tree::class, $this->test, "The source is not a valid Tree.");
     }
 
     public function testProcessing()

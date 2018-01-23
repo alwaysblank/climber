@@ -8,7 +8,7 @@ class WordPress extends Spotter
     'ID' => 'id',
     'menu_item_parent' => 'parent',
     'menu_order' => 'order',
-    'object_id' => 'target',
+    'url' => 'target',
     'title' => 'name',
     ];
 
@@ -24,8 +24,9 @@ class WordPress extends Spotter
             }
 
             foreach ($this->expected as $property => $rename) {
-                $temp[$item->ID][$rename] = property_exists($item, $property) ? $item->$property : null;
-
+                $temp[$item->ID][$rename] = property_exists($item, $property) 
+                    ? $item->$property 
+                    : null;
             }
         }
 

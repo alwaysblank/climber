@@ -6,58 +6,11 @@ use \PHPUnit\Framework\TestCase;
 include_once 'shims.php';
 // phpcs:enable
 
-class HTMLTest extends TestCase
+class ClimberTest extends TestCase
 {
-    public $source;
-
     protected function setUp()
     {
-        $this->source = [
-            0 => new \WP_Post([
-                'ID' => 22,
-                'object_id' => 111,
-                'title' => "Oregon",
-                'menu_item_parent' => 0,
-                'menu_order' => 1,
-            ]),
-            1 => new \WP_Post([
-                'ID' => 33,
-                'object_id' => 222,
-                'title' => "California",
-                'menu_item_parent' => 0,
-                'menu_order' => 2,
-            ]),
-            2 => new \WP_Post([
-                'ID' => 44,
-                'object_id' => 333,
-                'title' => "Portland",
-                'menu_item_parent' => 22,
-                'menu_order' => 3,
-            ]),
-            3 => new \WP_Post([
-                'ID' => 55,
-                'object_id' => 444,
-                'title' => "Corvallis",
-                'menu_item_parent' => 22,
-                'menu_order' => 4,
-            ]),
-            4 => new \WP_Post([
-                'ID' => 66,
-                'object_id' => 555,
-                'title' => "OSU",
-                'menu_item_parent' => 55,
-                'menu_order' => 5,
-            ]),
-            5 => new \WP_Post([
-                'ID' => 77,
-                'object_id' => 666,
-                'title' => "Iowa",
-                'menu_item_parent' => 0,
-                'menu_order' => 6,
-            ]),
-        ];
-
-        $this->tree = new Tree(new Spotter\WordPress($this->source));
+        $this->tree = new Tree(new Spotter\WordPress(\WP_Data::get()));
         $this->test = new Climber($this->tree);
     }
 
@@ -70,7 +23,7 @@ class HTMLTest extends TestCase
     public function testBasicMenu()
     {
         // phpcs:disable Generic.Files.LineLength.TooLong
-        $expected = '<nav class="simpleMenu" ><ul class="simpleMenu__menu level-0" ><li class="simpleMenu__item" ><a href="/111" class="simpleMenu__link" >Oregon</a><ul class="simpleMenu__menu simpleMenu__menu--submenu level-1" ><li class="simpleMenu__item" ><a href="/333" class="simpleMenu__link" >Portland</a></li><li class="simpleMenu__item" ><a href="/444" class="simpleMenu__link" >Corvallis</a><ul class="simpleMenu__menu simpleMenu__menu--submenu level-2" ><li class="simpleMenu__item" ><a href="/555" class="simpleMenu__link" >OSU</a></li></ul></li></ul></li><li class="simpleMenu__item" ><a href="/222" class="simpleMenu__link" >California</a></li><li class="simpleMenu__item" ><a href="/666" class="simpleMenu__link" >Iowa</a></li></ul></nav>';
+        $expected = '<nav class="simpleMenu" ><ul class="simpleMenu__menu level-0" ><li class="simpleMenu__item" ><a href="https://oregon.gov" class="simpleMenu__link" >Oregon</a><ul class="simpleMenu__menu simpleMenu__menu--submenu level-1" ><li class="simpleMenu__item" ><a href="https://oregon.gov/portland" class="simpleMenu__link" >Portland</a></li><li class="simpleMenu__item" ><a href="https://oregon.gov/corvallis" class="simpleMenu__link" >Corvallis</a><ul class="simpleMenu__menu simpleMenu__menu--submenu level-2" ><li class="simpleMenu__item" ><a href="https://oregon.gov/corvallis/osu" class="simpleMenu__link" >OSU</a></li></ul></li></ul></li><li class="simpleMenu__item" ><a href="https://california.gov" class="simpleMenu__link" >California</a></li><li class="simpleMenu__item" ><a href="https://iowa.gov" class="simpleMenu__link" >Iowa</a></li></ul></nav>';
         // phpcs:enable
 
         $this->assertEquals($expected, $this->test->element(), "Simple menu HTML does not match.");

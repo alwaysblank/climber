@@ -17,13 +17,7 @@ class Climber
       'itemAttr',
       'linkAttr',
     ];
-    public static $expected = [
-        'ID',
-        'menu_item_parent',
-        'menu_order',
-        'object_id',
-        'title',
-    ];
+
     protected $hookable = [
         'top',
         'menu',
@@ -31,7 +25,6 @@ class Climber
         'link',
     ];
 
-    protected $seed;
     protected $tree = [];
 
     protected $topClass = 'simpleMenu';
@@ -106,7 +99,6 @@ class Climber
             }
 
             $this->$property = $value;
-            $this->nursery($this->seed);
 
             return $this->$property;
         }
@@ -212,30 +204,6 @@ class Climber
     }
 
     /**
-     * Gets the URL for a given leaf.
-     *
-     * This is essentially a wrapper for `get_permalink()`. By encapsulating
-     * this call in such a way, we can account for situations (i.e. testing)
-     * where `get_permalink()` is unavailable.
-     *
-     * WARNING
-     *
-     * As currently written, the non-`get_permalink()` url is not intended
-     * to be *at all* functional—it is only there so something is returned.
-     *
-     * @param int $id
-     * @return void
-     */
-    protected function url(int $id)
-    {
-        if (function_exists('get_permalink')) {
-            return get_permalink($id);
-        } else {
-            return '/' . $id;
-        }
-    }
-
-    /**
      * Hook up a callback to a processing step.
      *
      * Ultimately callbacks are run through `call_user_func()`, so you
@@ -338,7 +306,7 @@ class Climber
     protected function fruit(array $bud)
     {
         $linkData = $this->runHook('link', [
-            'link' => $this->url(Z\Arrays::pluck($bud, [2, 'target'])),
+            'link' => Z\Arrays::pluck($bud, [2, 'target']),
             'class' => $this->linkClass,
             'attrs' => $this->attrs($this->linkAttr),
             'text' => Z\Arrays::pluck($bud, [2, 'name']),
