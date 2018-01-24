@@ -20,12 +20,12 @@ class WordPress extends Spotter
             
             // If there's no parent, `parent` should be null
             if ($item->menu_item_parent == 0) {
-              $item->menu_item_parent = null;
+                $item->menu_item_parent = null;
             }
 
             foreach ($this->expected as $property => $rename) {
-                $temp[$item->ID][$rename] = property_exists($item, $property) 
-                    ? $item->$property 
+                $temp[$item->ID][$rename] = property_exists($item, $property)
+                    ? $item->$property
                     : null;
             }
         }

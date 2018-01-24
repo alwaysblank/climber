@@ -36,7 +36,7 @@ class TreeTest extends TestCase
                 'order' => 1,
                 'target' => 'https://california.gov',
                 'name' => 'California',
-            ]
+            ],
         ];
         $this->assertEquals($this->test->getLeaf(33), $valid);
     }
@@ -52,17 +52,25 @@ class TreeTest extends TestCase
 
     public function testChildrenPath()
     {
-        $this->assertEquals([22, 55], $this->test->getLeafPath(66), "Did not find correct ancestors (should be two of them).");
-        $this->assertEquals([], $this->test->getLeafPath(22), "Did not correctly return no ancestors (i.e. an empty array)");
+        $this->assertEquals(
+            [22, 55],
+            $this->test->getLeafPath(66),
+            "Did not find correct ancestors (should be two of them)."
+        );
+        $this->assertEquals(
+            [],
+            $this->test->getLeafPath(22),
+            "Did not correctly return no ancestors (i.e. an empty array)"
+        );
     }
-    
+
     public function testChildrenSiblings()
     {
         $leaf44siblings = $this->test->getLeafSiblings(44);
         $this->assertTrue(
             isset($leaf44siblings[44]) && isset($leaf44siblings[55])
         );
-    
+
         $leaf44siblings_exclude = $this->test->getLeafSiblings(44, true);
         $this->assertTrue(
             !isset($leaf44siblings_exclude[44]) && isset($leaf44siblings_exclude[55])
@@ -72,6 +80,7 @@ class TreeTest extends TestCase
     public function testSetParent()
     {
         $parentTest = $this->test;
+
         // Verifies initial state
         $this->assertEquals(22, $parentTest->getLeafContent(55, 0), "Initial parent not set correctly.");
         $this->assertContains(55, $parentTest->getLeafContent(22, 1), "Initial child not set correctly.");
@@ -82,6 +91,60 @@ class TreeTest extends TestCase
         // Verify change
         $this->assertEquals(77, $parentTest->getLeafContent(55, 0), "Target parent not changed.");
         $this->assertContains(55, $parentTest->getLeafContent(77, 1), "Target not added to new parent's children.");
-        $this->assertNotContains(22, $parentTest->getLeafContent(22, 1), "Target not removed from old parent's children.");
+        $this->assertNotContains(
+            22,
+            $parentTest->getLeafContent(22, 1),
+            "Target not removed from old parent's children."
+        );
+    }
+
+    public function testSetChildren()
+    {
+        $childrenTest = $this->test;
+
+        // Verify Initial state
+        $this->assertEquals(
+            22,
+            $childrenTest->getLeafContent(55, 0),
+            "Child 55 was does not have correct initial parent."
+        );
+        $this->assertNull(
+            $childrenTest->getLeafContent(77, 0),
+            "Child 77 does not have correct initial parent (none)."
+        );
+        $this->assertNotContains(55, $childrenTest->getLeafContent(33, 1), "Child 55 is already a child of parent 33.");
+        $this->assertNotContains(77, $childrenTest->getLeafContent(33, 1), "Child 77 is already a child of parent 33.");
+
+        $childrenTest->setLeafProp(33, 1, [55, 77]);
+
+        // Verify change
+        $this->assertContains(55, $childrenTest->getLeafContent(33, 1), "Child 55 was not moved.");
+        $this->assertContains(77, $childrenTest->getLeafContent(33, 1), "Child 77 was not moved.");
+        $this->assertEquals([33, 55], $childrenTest->getLeafPath(66), "Grandchild not in correct location.");
+    }
+
+    public function testSetData()
+    {
+        $dataTest = $this->test;
+
+        $dataTest->setLeafProp(44, 2, ['name', 'New Carthage']);
+
+        $this->assertEquals('New Carthage', $dataTest->getLeafContent(44, 2, 'name'));
+    }
+
+    public function testSetLeaf()
+    {
+        $leafTest = $this->test;
+
+        $leafTest->setLeaf(
+            55, // targeting leaf 55
+            [3, 'current'], // make this active
+            [2, ['name', 'New Rome']], // change the name
+            [0, 33]// Make leaf 33 the new parent
+        );
+
+        $this->assertEquals('New Rome', $leafTest->getLeafContent(55, 2, 'name'));
+        $this->assertEquals('current', $leafTest->getLeafContent(55, 3));
+        $this->assertContains(55, $leafTest->getLeafContent(33, 1));
     }
 }

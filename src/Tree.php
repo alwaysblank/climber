@@ -9,21 +9,21 @@ use \Zenodorus as Z;
  * This class generates data trees for processing by Climber.
  * The idea is to make the data structure agnostic and easy to
  * move around in.
- * 
+ *
  * Data trees ultimately look like this:
  * ```
  * [
  *      22 => [         // This is the unique id of the menu item
- * 
- *          null,       // The parent of this item; null in this 
+ *
+ *          null,       // The parent of this item; null in this
  *                      // case as this is a top-level item.
- * 
+ *
  *          [44, 55],   // The children of this menu item.
- * 
+ *
  *          [...],      // Other data about this menu item. This data
- *                      // is likely relevant to Climber, but isn't 
+ *                      // is likely relevant to Climber, but isn't
  *                      // important to Tree.
- 
+
  *          'parent',   // This is the "active" key, which contains a
  *                      // value when leaf is active, or the parent/
  *                      // ancestor of an active leaf. "Active" state
@@ -31,22 +31,22 @@ use \Zenodorus as Z;
  *      ],
  *      44 => [
  *          22,         // The id of the parent (22 in this case).
- * 
+ *
  *          [],         // An empty array, because this menu item has
  *                      // no children.
- * 
+ *
  *          [...]       // Other data, as above.
- * 
+ *
  *          'current'   // The "active" key, as above. In this case, it
  *                      // says "current" because we're currently on
  *                      // this page.
  *      ]
  * ]
  * ```
- * 
+ *
  * They exist in a flat list, but provide all the information that
  * Tree needs to parse and move around them.
- * 
+ *
  * @param Spotter/[ClassName] $spotter      An instance of a class that
  *                                          extends Spotter/Spotter
  */
@@ -91,7 +91,8 @@ class Tree
      * @return integer|boolean  Returns an integer if viable, boolean `false`
      *                          otherwise.
      */
-    protected function query($slot) {
+    protected function query($slot)
+    {
         if (is_int($slot)) {
             return $slot;
         } elseif (isset($this->map[$slot])) {
@@ -103,7 +104,7 @@ class Tree
 
     /**
      * Get a workspace.
-     * 
+     *
      * This clones the Tree if called from the original; otherwise it returns
      * the current Tree. This is so that we can isolate changes until we're
      * sure they're successful—bit also prevent our scripts from generating
@@ -197,10 +198,10 @@ class Tree
 
     /**
      * Get data from within a leaf.
-     * 
+     *
      * The point of this is to avoid having to do ugly stuff like
      * `$this->getLeaf(2)[1]['order']`.
-     * 
+     *
      * Passing $data allows you to
      *
      * @param integer $id
@@ -269,15 +270,15 @@ class Tree
 
     /**
      * Forceably sets a leaf property.
-     * 
+     *
      * **Probably Don't Use This Directly!**
-     * 
+     *
      * If you need to set a prop, try using one of these instead:
      * - `setLeafProp()`
      * - `setParent()`
      * - `setChildren()`
      * - `setData()`
-     * 
+     *
      * This method should only ever be called by other methods that really know
      * what they're doing: It makes no checks beyond making sure that the leaf
      * actually exists. You can easily break or overwrite things you shouldn't
@@ -305,12 +306,12 @@ class Tree
 
     /**
      * Set some data on a leaf.
-     * 
+     *
      * This only sets "top-level" data—in other words, it does not treat
      * values fir the 2 (data) slot any differently than other data, and doesn't
      * allow you to target specific keys in the 2 (data) slot. For that, see
      * `Tree::setLeafPropDeep()`.
-     * 
+     *
      * @see Tree::setLeafPropDeep()
      *
      * @param integer $id
@@ -338,8 +339,8 @@ class Tree
 
                     default:
                         return $this->dangerouslySetLeafProp(
-                            $id, 
-                            $slot, 
+                            $id,
+                            $slot,
                             $value
                         );
                         break;
@@ -367,8 +368,8 @@ class Tree
             && isset($action[1])
             && (is_int($action[0]) || is_string($action[0]))) {
             if ($data = $this->getLeafContent($id, 2)) {
-                $data[$action[0]] = $value;
-                return $this->dangerouslySetLeafProp($id, 2, $action[1]);
+                $data[$action[0]] = $action[1];
+                return $this->dangerouslySetLeafProp($id, 2, $data);
             }
         }
 
@@ -377,19 +378,22 @@ class Tree
 
     /**
      * Set a leaf parent.
-     * 
+     *
      * By default, this method will also modify all other leaves affected by
      * this change (i.e. the new and previous parents). To disable this
      * behavior, set `$cascade` to `false`.
-     * 
+     *
      * **WARNING!!**
-     * Setting `$cascade` to `false` may have undesirable behavior, as 
+     * Setting `$cascade` to `false` may have undesirable behavior, as
      * relationships between leaves will no longer be internally consistent.
+     *
+     * This is essentially a wrapper for `changeParent()` with some additional
+     * logic. You should probably call this instead of `changeParent()`.
      *
      * @param integer $id
      * @param integer $parent
      * @param boolean $cascade
-     * @return array|boolean    Returns changed leaf if successful, false 
+     * @return array|boolean    Returns changed leaf if successful, false
      *                          otherwise.
      */
     protected function setParent(int $id, int $parent, bool $cascade = true)
@@ -397,42 +401,7 @@ class Tree
         if (!$cascade) {
             return $this->dangerouslySetLeafProp($parent, 0, $id);
         } elseif ($cascade) {
-            $workspace = $this->workspace();
-
-            $previous_parent = $workspace->getLeafContent($id, 0);
-
-            // If this already had a parent, remove this from its children.
-            if (is_int($previous_parent)) {
-                $previous_parent_children = $workspace->getLeafContent(
-                    $previous_parent,
-                    1
-                ) ?? []; // If we get no content, return an empty array.
-
-                $previous_parent_children = array_flip($previous_parent_children);
-                unset($previous_parent_children[$id]);
-
-                $workspace->setChildren(
-                    $previous_parent, 
-                    array_flip($previous_parent_children),
-                    false  // We're going to be doing this later.
-                );
-            }
-
-            $children = $workspace->getLeafContent($parent, 1);
-            $children[] = $id;
-
-            $populated = $workspace->setChildren(
-                $parent,
-                $children
-            );
-
-            $self = $workspace->dangerouslySetLeafProp($id, 0, $parent);
-
-            if ($populated && $self) {
-                $this->tree = $workspace->grow();
-                unset($workspace, $success);
-                return $this->getLeaf($id);
-            }
+            return $this->changeParent($id, $parent);
         }
 
         return false;
@@ -440,14 +409,17 @@ class Tree
 
     /**
      * Set leaf children.
-     * 
+     *
      * By default, this will also modify all leaves that are affected by this
-     * changed (namely, new and removed children of `$id`). To disable this
-     * behavior, set `$cascade` to `false`. 
-     * 
+     * change (namely, new and removed children of `$id`). To disable this
+     * behavior, set `$cascade` to `false`.
+     *
      * **WARNING!!**
-     * Setting `$cascade` to `false` may have undesirable behavior, as 
+     * Setting `$cascade` to `false` may have undesirable behavior, as
      * relationships between leaves will no longer be internally consistent.
+     *
+     * This is essentially a wrapper for `changeParent()` with some additional
+     * logic. You should probably call this instead of `changeParent()`.
      *
      * @param integer $id
      * @param array $children
@@ -460,66 +432,31 @@ class Tree
             return $this->dangerouslySetLeafProp($id, 1, $children);
         } elseif ($cascade) {
             $workspace = $this->workspace();
-            
-            $previous_children = $workspace->getLeafContent($id, 1);
-            $remove = array_diff($previous_children, $children);
-            $add = array_diff($children, $previous_children);
-            
-            if (count($remove) > 0) {
-                $removed = array_reduce($remove, 
-                    function($carry, $current) use ($workspace) {
-                        // If $carry is false, we've already failed.
-                        if ($carry === false) {
-                            return false;
-                        }
+            $setChildren = array_reduce(
+                $children,
+                function ($carry, $current) use ($id, $workspace) {
+                    // If $carry is false, we've already failed.
+                    if ($carry === false) {
+                        return false;
+                    }
 
-                        $result = $workspace->setParent($current, null, false);
+                    $result = $workspace->changeParent($current, $id);
 
-                        // The first iteration
-                        if ($result && $carry === null) {
-                            return true;
-                        } elseif ($result === false) {
-                            return false;
-                        } else {
-                            return $carry;
-                        }
-                    }, 
-                    null
-                );
-            } else {
-                $removed = true; // Don't need to remove anything
-            }
+                    if ($result && $carry === null) {
+                        // Set `true` if first iteration and succeeded.
+                        return true;
+                    } elseif ($result === false) {
+                        return false;
+                    } else {
+                        return $carry;
+                    }
+                },
+                null
+            );
 
-            if (count($add) > 0) {
-                $added = array_reduce($add, 
-                    function($carry, $current) use ($id, $workspace) {
-                        // If $carry is false, we've already failed.
-                        if ($carry === false) {
-                            return false;
-                        }
-
-                        $result = $workspace->setParent($current, $id, false);
-
-                        // The first iteration
-                        if ($result && $carry === null) {
-                            return true;
-                        } elseif ($result === false) {
-                            return false;
-                        } else {
-                            return $carry;
-                        }
-                    }, 
-                    null
-                );
-            } else {
-                $added = true; // Don't need to add anything.
-            }
-
-            $self = $workspace->setChildren($id, $children, false);
-
-            if ($removed && $added && $self) {
+            if ($setChildren) {
                 $this->tree = $workspace->grow();
-                unset($workspace, $removed, $added, $self);
+                unset($workspace);
                 return $this->getLeaf($id);
             }
         }
@@ -528,8 +465,94 @@ class Tree
     }
 
     /**
+     * Change the parent of a leaf, and cascade those changes out.
+     *
+     * This sets a new parent on the leaf represented by `$child`, but it also
+     * modifies the new and old parents to reflect that change. Since all leaves
+     * are only aware of their direct parents and children, this change allows
+     * for significant structure modifications with only minimal change to the
+     * tree structure.
+     *
+     * @param integer $child
+     * @param integer $newParent
+     * @return array|boolean    Returns the new child leaf if successful,
+     *                          boolean `false` otherwise.
+     */
+    protected function changeParent(int $child, int $newParent)
+    {
+        $workspace = $this->workspace();
+
+        $childLeaf = $workspace->getLeaf($child);
+        $newParentLeaf = $workspace->getLeaf($newParent);
+        $oldParent = $childLeaf[0];
+
+        /**
+         * If $newParent is a child of $child, we don't want to create
+         * a loop, so remove it from $child's children.
+         */
+        if (in_array($newParent, $childLeaf[1])) {
+            $removedRecursiveChild = $workspace->dangerouslySetLeafProp(
+                $child,
+                1,
+                Z\Arrays::removeByValue(
+                    $workspace->getLeafContent($child, 1),
+                    $newParent
+                )
+            );
+        } else {
+            $removedRecursiveChild = true;
+        }
+
+        /**
+         * Remove $child from $oldParent's children, if $child has an existing
+         * parent.
+         */
+        if (null !== $oldParent) {
+            $removedFromOldParent = $workspace->dangerouslySetLeafProp(
+                $oldParent,
+                1,
+                Z\Arrays::removeByValue(
+                    $workspace->getLeafContent($child, 1),
+                    $newParent
+                )
+            );
+        } else {
+            $removedFromOldParent = true;
+        }
+
+        /**
+         * Set $child's new parent to $newParent.
+         */
+        $setNewParent = $workspace->dangerouslySetLeafProp(
+            $child,
+            0,
+            $newParent
+        );
+
+        /**
+         * Add $child to $newParent's children.
+         */
+        $setNewChild = $workspace->dangerouslySetLeafProp(
+            $newParent,
+            1,
+            array_merge($newParentLeaf[1], [$child])
+        );
+
+        if ($removedRecursiveChild
+            && $removedFromOldParent
+            && $setNewParent
+            && $setNewChild ) {
+            $this->tree = $workspace->grow();
+            unset($workspace);
+            return $this->getLeaf($child);
+        }
+
+        return false;
+    }
+
+    /**
      * Set many values on a leaf.
-     * 
+     *
      * Pass as many arrays as you like to the method; it will apply them all in
      * order. The template for an array is:
      * [<slot>, <value>]             // top-level slots
@@ -546,10 +569,10 @@ class Tree
      * The method will return the changed leaf if it is successful. If it
      * encounters any problems, it will instead return `false`. If any of the
      * `$actions` fail, all actions are considered to have failed.
-     * 
+     *
      * This method operates on a clone of the current Tree, so changes are only
      * applied if all actions are successful.
-     * 
+     *
      * @param integer $id
      * @param array ...$actions  Several arrays.
      * @return array|boolean     Returns the new leaf if successful, `false` if
@@ -561,8 +584,8 @@ class Tree
             $workspace = $this->workspace();
 
             $success = array_reduce(
-                $actions, 
-                function($carry, $current) use ($id, $workspace) {
+                $actions,
+                function ($carry, $current) use ($id, $workspace) {
                     // If $carry is false, we've already failed.
                     if ($carry === false) {
                         return false;
@@ -575,8 +598,8 @@ class Tree
 
                     // setLeafProp() will handle different prop types for us.
                     $result = $workspace->setLeafProp(
-                        $id, 
-                        $current[0], 
+                        $id,
+                        $current[0],
                         $current[1]
                     );
 
@@ -589,7 +612,7 @@ class Tree
                     } else {
                         return $carry;
                     }
-                }, 
+                },
                 null
             );
 

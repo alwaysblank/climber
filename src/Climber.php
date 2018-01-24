@@ -48,7 +48,6 @@ class Climber
     public function __construct(Tree $tree, $active = null)
     {
         $this->tree = $tree;
-        
     }
 
   /**
@@ -278,7 +277,7 @@ class Climber
     }
 
     /**
-     * Returns some data about the leaf in a 
+     * Returns some data about the leaf in a
      * slightly more accessible format.
      *
      * @param array $leaf
@@ -398,7 +397,7 @@ class Climber
 
     /**
      * Convert the tree into something we can pass to Climber::branch().
-     * 
+     *
      * All it does is trip out items from the $tree that have no parents (since
      * all top-level items have no parents).
      *
@@ -409,7 +408,7 @@ class Climber
     {
         return [
             0 => null,
-            1 => array_keys(array_filter($tree, function($leaf) {
+            1 => array_keys(array_filter($tree, function ($leaf) {
                 return $leaf[0] === null;
             })),
         ];

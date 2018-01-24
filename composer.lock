@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "c74cec0fc489da9809ccf1a7379d014c",
+    "content-hash": "12cc9e330ccf7701e7a8747e1ebde414",
     "packages": [
         {
             "name": "zenodorus/arrays",
-            "version": "1.0.1",
+            "version": "1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zenodorus-tools/arrays.git",
-                "reference": "c089f9400c7c5573570a52effa56b35d98ce68be"
+                "reference": "31cfbe9b98d773943b29fa53fc64ec37e52ef02d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zenodorus-tools/arrays/zipball/c089f9400c7c5573570a52effa56b35d98ce68be",
-                "reference": "c089f9400c7c5573570a52effa56b35d98ce68be",
+                "url": "https://api.github.com/repos/zenodorus-tools/arrays/zipball/31cfbe9b98d773943b29fa53fc64ec37e52ef02d",
+                "reference": "31cfbe9b98d773943b29fa53fc64ec37e52ef02d",
                 "shasum": ""
             },
             "require": {
@@ -47,7 +47,7 @@
             ],
             "description": "Tools for messing with arrays.",
             "homepage": "https://zenodor.us",
-            "time": "2018-01-22T23:45:52+00:00"
+            "time": "2018-01-24T18:31:32+00:00"
         },
         {
             "name": "zenodorus/strings",
@@ -1642,6 +1642,8 @@
     },
     "prefer-stable": false,
     "prefer-lowest": false,
-    "platform": [],
+    "platform": {
+        "php": ">=7"
+    },
     "platform-dev": []
 }

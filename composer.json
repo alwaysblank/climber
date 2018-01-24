@@ -10,7 +10,7 @@
     ],
     "require": {
       "php": ">=7",
-      "zenodorus/arrays": "^1.0",
+      "zenodorus/arrays": "^1.1",
       "zenodorus/strings": "^1.0"
     },
     "require-dev": {

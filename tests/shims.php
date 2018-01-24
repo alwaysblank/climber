@@ -1,8 +1,7 @@
 <?php
-// phpcs:disable PSR1.Classes.ClassDeclaration.MissingNamespace, Squiz.Classes.ValidClassName.NotCamelCaps
+// phpcs:disable PSR1.Classes.ClassDeclaration.MissingNamespace, Squiz.Classes.ValidClassName.NotCamelCaps, PSR1.Classes.ClassDeclaration.MultipleClasses
 
 class WP_Post
-// phpcs:enable
 {
 
     public $ID;
@@ -77,3 +76,5 @@ class WP_Data
         return $instance->data;
     }
 }
+
+// phpcs:enable
