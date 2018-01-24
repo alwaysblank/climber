@@ -131,7 +131,7 @@ class Tree
             $planted[$id][0] = $data['parent'];
 
             // Set this as a child on its parent
-            if ($data['parent'] !== null && isset($temp[$data['parent']])) {
+            if (null !== $data['parent'] && isset($temp[$data['parent']])) {
                 if (isset($planted[$data['parent']]) && isset($planted[$data['parent']][1])) {
                     array_push($planted[$data['parent']][1], $id);
                 } else {
@@ -147,6 +147,9 @@ class Tree
             if (!isset($planted[$id][1])) {
                 $planted[$id][1] = [];
             }
+
+            // Remove $data['parent'] since it's now redundant.
+            unset($data['parent']);
 
             $planted[$id][2] = $data;
         }
@@ -210,17 +213,11 @@ class Tree
         $query = $this->query($slot);
 
         if (false !== $query) {
-            // Make sure $data is valid.
-            if ((null !== $data && !(is_string($data) || is_int($data)))
-                || (null !== $data && 2 !== $query)) {
-                $data = null;
-            }
-
             $leaf = $this->getLeaf($id);
 
             if ($leaf) {
-                if (null !== $data && isset($leaf[$query][$data])) {
-                    return $leaf[$query][$data];
+                if (2 === $query && null !== $data && isset($leaf[2][$data])) {
+                    return $leaf[2][$data];
                 } elseif (null === $data && isset($leaf[$query])) {
                     return $leaf[$query];
                 }
@@ -424,11 +421,14 @@ class Tree
             $children = $workspace->getLeafContent($parent, 1);
             $children[] = $id;
 
-            $success = $workspace->setChildren(
+            $populated = $workspace->setChildren(
                 $parent,
                 $children
             );
-            if ($success) {
+
+            $self = $workspace->dangerouslySetLeafProp($id, 0, $parent);
+
+            if ($populated && $self) {
                 $this->tree = $workspace->grow();
                 unset($workspace, $success);
                 return $this->getLeaf($id);
