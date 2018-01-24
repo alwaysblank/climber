@@ -5,11 +5,11 @@ namespace Livy\Climber\Spotter;
 class WordPress extends Spotter
 {
     public $expected = [
-    'ID' => 'id',
-    'menu_item_parent' => 'parent',
-    'menu_order' => 'order',
-    'url' => 'target',
-    'title' => 'name',
+        'ID' => 'id',
+        'menu_item_parent' => 'parent',
+        'menu_order' => 'order',
+        'url' => 'target',
+        'title' => 'name',
     ];
 
     protected function plant()

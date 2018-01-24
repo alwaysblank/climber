@@ -45,9 +45,10 @@ class Climber
      *
      * @param Tree $tree
      */
-    public function __construct(Tree $tree)
+    public function __construct(Tree $tree, $active = null)
     {
         $this->tree = $tree;
+        
     }
 
   /**
@@ -104,6 +105,32 @@ class Climber
         }
 
         return null;
+    }
+
+
+    public function activate(int $hint)
+    {
+        if ($leaf = $this->tree->getLeaf($hint)) {
+            $path = $this->tree->getLeafPath($hint);
+            $path[] = $hint;
+            foreach (array_reverse($path) as $order => $id) {
+                switch ($order) {
+                    case 0:
+                        $distance = 'current';
+                        break;
+                    
+                    case 1:
+                        $distance = 'parent';
+                        break;
+                    
+                    default:
+                        $distance = 'ancestor';
+                        break;
+                }
+                $this->tree->setLeafProp($id, 3, $distance);
+                unset($distance);
+            }
+        }
     }
 
     /**

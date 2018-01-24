@@ -55,8 +55,8 @@ class TreeTest extends TestCase
 
     public function testChildrenPath()
     {
-        $this->assertEquals([22, 55], $this->test->getLeafPath(66));
-        $this->assertEquals([], $this->test->getLeafPath(22));
+        $this->assertEquals([22, 55], $this->test->getLeafPath(66), "Did not find correct ancestors (should be two of them).");
+        $this->assertEquals([], $this->test->getLeafPath(22), "Did not correctly return no ancestors (i.e. an empty array)");
     }
     
     public function testChildrenSiblings()
@@ -70,5 +70,11 @@ class TreeTest extends TestCase
         $this->assertTrue(
             !isset($leaf44siblings_exclude[44]) && isset($leaf44siblings_exclude[55])
         );
+    }
+
+    public function testSetLeafProp()
+    {
+        $this->test->setLeafProp(44, 0, 22);
+        $this->assertEquals(22, $this->test->getLeafContent(44, 0));
     }
 }
