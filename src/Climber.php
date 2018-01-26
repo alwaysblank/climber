@@ -604,24 +604,28 @@ class Climber
      */
     public function element($echo = false)
     {
-        $topData = $this->runHook('top', [
-            'class' => $this->topClass,
-            'attrs' => $this->attrs($this->topAttr),
-            'tree' => $this->tree,
-            'echo' => $echo,
-        ]);
+        if (null != $this->tree->grow()) {
+            $topData = $this->runHook('top', [
+                'class' => $this->topClass,
+                'attrs' => $this->attrs($this->topAttr),
+                'tree' => $this->tree,
+                'echo' => $echo,
+            ]);
 
-        $menu = sprintf(
-            '<nav class="%1$s"%2$s>%3$s</nav>',
-            $topData['class'],
-            $topData['attrs'],
-            $this->branch($this->harvest($topData['tree']))
-        );
+            $menu = sprintf(
+                '<nav class="%1$s"%2$s>%3$s</nav>',
+                $topData['class'],
+                $topData['attrs'],
+                $this->branch($this->harvest($topData['tree']))
+            );
 
-        if ($topData['echo']) {
-            echo $menu;
-        } else {
-            return $menu;
+            if ($topData['echo']) {
+                echo $menu;
+            } else {
+                return $menu;
+            }
         }
+
+        return null;
     }
 }

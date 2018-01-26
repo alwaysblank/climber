@@ -29,6 +29,14 @@ class ClimberTest extends TestCase
         $this->assertEquals($expected, $this->test->element(), "Simple menu HTML does not match.");
     }
 
+    public function testNoMenu()
+    {
+        $nullMenu = new Climber(new Tree(new Spotter\WordPress(null)));
+        $falseMenu = new Climber(new Tree(new Spotter\WordPress(false)));
+        $this->assertNull($nullMenu->element());
+        $this->assertNull($falseMenu->element());
+    }
+
     /**
      * @depends testBasicMenu
      */

@@ -166,39 +166,43 @@ class Tree
      */
     protected function plant()
     {
-        $temp = $this->germinated;
-        $planted = [];
-        foreach ($temp as $id => $data) {
-            // Set the parent for this child
-            $planted[$id][0] = $data['parent'];
+        if (is_array($this->germinated)) {
+            $temp = $this->germinated;
+            $planted = [];
+            foreach ($temp as $id => $data) {
+                // Set the parent for this child
+                $planted[$id][0] = $data['parent'];
 
-            // Set this as a child on its parent
-            if (null !== $data['parent'] && isset($temp[$data['parent']])) {
-                if (isset($planted[$data['parent']])
-                    && isset($planted[$data['parent']][1])) {
-                    array_push($planted[$data['parent']][1], $id);
-                } else {
-                    $planted[$data['parent']][1] = [$id];
+                // Set this as a child on its parent
+                if (null !== $data['parent'] && isset($temp[$data['parent']])) {
+                    if (isset($planted[$data['parent']])
+                        && isset($planted[$data['parent']][1])) {
+                        array_push($planted[$data['parent']][1], $id);
+                    } else {
+                        $planted[$data['parent']][1] = [$id];
+                    }
                 }
+
+                // Remove this: we no longer need it.
+                unset($temp[$id]['parent']);
+
+                // If children is not set, set an empty array.
+                // Otherwise, assume set at leave alone.
+                if (!isset($planted[$id][1])) {
+                    $planted[$id][1] = [];
+                }
+
+                // Remove $data['parent']. We want leaf slot 0 to be the single
+                // source of truth re: parentage.
+                unset($data['parent']);
+
+                $planted[$id][2] = $data;
             }
 
-            // Remove this: we no longer need it.
-            unset($temp[$id]['parent']);
-
-            // If children is not set, set an empty array.
-            // Otherwise, assume set at leave alone.
-            if (!isset($planted[$id][1])) {
-                $planted[$id][1] = [];
-            }
-
-            // Remove $data['parent']. We want leaf slot 0 to be the single
-            // source of truth re: parentage.
-            unset($data['parent']);
-
-            $planted[$id][2] = $data;
+            return $planted;
         }
 
-        return $planted;
+        return null;
     }
 
     /**

@@ -16,7 +16,8 @@ abstract class Spotter
 
     public function germinate()
     {
-        $this->sprout = $this->plant();
+        // Only pass this on if it's a valid seed.
+        $this->sprout = $this->seed ? $this->plant() : null;
         return $this->sprout;
     }
 }
