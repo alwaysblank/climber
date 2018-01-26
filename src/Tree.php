@@ -46,9 +46,9 @@ use \Zenodorus as Z;
  *
  * They exist in a flat list, but provide all the information that
  * Tree needs to parse and move around them.
- * 
+ *
  * Most operations that make changes to `$tree` will carry out those operations
- * on a clone of the current Tree, and then apply them to the original Tree 
+ * on a clone of the current Tree, and then apply them to the original Tree
  * only if those operations are successful. This means that you should generally
  * be able to trust the data in `$tree`. The major caveat to this is the use of
  * `dangerouslySetLeafProp()` which is not careful or delicate and acts directly
@@ -76,7 +76,7 @@ class Tree
     
     /**
      * Legend for array keys.
-     * 
+     *
      * Internally, Tree uses positional keys for simplicity and speed, but this
      * allows us to alias them to more human-readable keys.
      *
@@ -91,7 +91,7 @@ class Tree
 
     /**
      * Sanity check.
-     * 
+     *
      * This is set to `true` when Tree is cloned (usually for a workspace). It
      * helps prevents infinite recursion/clone generation.
      *
@@ -122,7 +122,7 @@ class Tree
 
     /**
      * Get an appropriate query for string/integer slot requests.
-     * 
+     *
      * This allows us to easily use aliases for numeric slot keys, and easily
      * expand that list through `$map` if necessary.
      *
@@ -159,7 +159,7 @@ class Tree
 
     /**
      * Process the seed to generate a data tree.
-     * 
+     *
      * This expects normalized data from a Spotter.
      *
      * @return void
@@ -174,7 +174,7 @@ class Tree
 
             // Set this as a child on its parent
             if (null !== $data['parent'] && isset($temp[$data['parent']])) {
-                if (isset($planted[$data['parent']]) 
+                if (isset($planted[$data['parent']])
                     && isset($planted[$data['parent']][1])) {
                     array_push($planted[$data['parent']][1], $id);
                 } else {
@@ -191,7 +191,7 @@ class Tree
                 $planted[$id][1] = [];
             }
 
-            // Remove $data['parent']. We want leaf slot 0 to be the single 
+            // Remove $data['parent']. We want leaf slot 0 to be the single
             // source of truth re: parentage.
             unset($data['parent']);
 
@@ -203,15 +203,15 @@ class Tree
 
     /**
      * Plants the tree.
-     * 
+     *
      * This is used to make sure the data we're going to use came from an actual
      * Spotter, and to complain if it didn't.
-     * 
+     *
      * It's a public function so that we can pass a new Spotter and generate
      * a new tree after this Tree has been instantiated. That's not really
      * recommended, though.
      *
-     * @param object $spotter   An object in a class that extends 
+     * @param object $spotter   An object in a class that extends
      *                          Spotter\Spotter.
      * @return void
      */
@@ -228,7 +228,7 @@ class Tree
 
     /**
      * Publically return the tree, as it exists.
-     * 
+     *
      * In many ways, the core function of this class.
      *
      * @return array
@@ -292,7 +292,7 @@ class Tree
    */
     public function getLeafPath(int $id, array $ancestors = [])
     {
-        if (null === $this->getLeaf($id) 
+        if (null === $this->getLeaf($id)
             || null === $this->getLeafContent($id, 0)) {
             // This item doesn't exist or has no ancestors.
             // Either we've reached the last step in our path, we were passed
@@ -366,15 +366,15 @@ class Tree
     /**
      * Set a leaf prop, safely.
      *
-     * This method will determine which slot you are targeting and act 
+     * This method will determine which slot you are targeting and act
      * accordingly. For the actual behavior of setting various slots, see
      * the methods that deal with them.
-     * 
+     *
      * @see Tree::setParent()           Set a parent.
      * @see Tree::setChildren()         Set children.
      * @see Tree::setData()             Set data.
      * @see Tree::setActive()           Set active state.
-     * 
+     *
      *
      * @param integer $id
      * @param integer|string $slot
@@ -415,7 +415,7 @@ class Tree
 
     /**
      * Set some data in the 2 (data) slot on a leaf.
-     * 
+     *
      * Prevents user from setting the `id` value of a leaf, because ids should
      * be immutable.
      *
@@ -458,7 +458,7 @@ class Tree
      *
      * This is essentially a wrapper for `changeParent()` with some additional
      * logic. You should probably call this instead of `changeParent()`.
-     * 
+     *
      * @see Tree::changeParent()
      *
      * @param integer $id
@@ -491,7 +491,7 @@ class Tree
      *
      * This is essentially a wrapper for `changeParent()` with some additional
      * logic. You should probably call this instead of `changeParent()`.
-     * 
+     *
      * @see Tree::changeParent()
      *
      * @param integer $id
@@ -561,11 +561,11 @@ class Tree
      * are only aware of their direct parents and children, this change allows
      * for significant structure modifications with only minimal change to the
      * `$tree` structure.
-     * 
+     *
      * This method is actually the core method for both `setChildren()` and
      * `setParent()`, they just use it in slightly different ways. You should
      * probably use one of those methods instead of calling this one directly.
-     * 
+     *
      * @see Tree::setChildren()
      * @see Tree::setParent()
      *

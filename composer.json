@@ -9,7 +9,7 @@
         }
     ],
     "require": {
-      "php": ">=7",
+      "php": ">=7.1",
       "zenodorus/arrays": "^1.1",
       "zenodorus/strings": "^1.0"
     },
