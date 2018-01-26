@@ -5,6 +5,8 @@ An alternative to WordPress's built-in Nav_Walker, 🧗 Climber creates a more
 reasonable data structure, which can be interacted with directly or used to 
 generate the HTML for a navigation menu.
 
+[![Build Status](https://travis-ci.org/alwaysblank/climber.svg?branch=master)](https://travis-ci.org/alwaysblank/climber)
+
 #### ☠️ Currently in Development ☠️
 #### ⚡ Probably not ready for production ⚡
 
