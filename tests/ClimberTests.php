@@ -34,16 +34,16 @@ class ClimberTest extends TestCase
      */
     public function testSetClass()
     {
-        $this->test->topClass = "{$this->test->topClass} newTop";
+        $this->test->topClass .= " newTop";
         $this->assertNotFalse(strpos($this->test->element(), "newTop"), 'Cannot set `$topClass`.');
 
-        $this->test->menuClass = "{$this->test->menuClass} newMenu";
+        $this->test->menuClass .= " newMenu";
         $this->assertNotFalse(strpos($this->test->element(), "newMenu"), 'Cannot set `$menuClass`.');
 
-        $this->test->itemClass = "{$this->test->itemClass} newItem";
+        $this->test->itemClass .= " newItem";
         $this->assertNotFalse(strpos($this->test->element(), "newItem"), 'Cannot set `$itemClass`.');
 
-        $this->test->linkClass = "{$this->test->linkClass} newLink";
+        $this->test->linkClass .= " newLink";
         $this->assertNotFalse(strpos($this->test->element(), "newLink"), 'Cannot set `$linkClass`.');
     }
 
