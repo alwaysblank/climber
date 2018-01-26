@@ -512,14 +512,15 @@ class Climber
      * All it does is trip out items from the $tree that have no parents (since
      * all top-level items have no parents).
      *
-     * @param array $tree
+     * @param Tree $tree
      * @return string
      */
-    protected function harvest(array $tree)
+    protected function harvest(Tree $tree)
     {
+        $treeLeaves = $tree->grow();
         return [
             0 => null,
-            1 => array_keys(array_filter($tree, function ($leaf) {
+            1 => array_keys(array_filter($treeLeaves, function ($leaf) {
                 return $leaf[0] === null;
             })),
         ];
@@ -538,7 +539,7 @@ class Climber
         $topData = $this->runHook('top', [
             'class' => $this->topClass,
             'attrs' => $this->attrs($this->topAttr),
-            'tree' => $this->tree->grow(),
+            'tree' => $this->tree,
             'echo' => $echo,
         ]);
 
