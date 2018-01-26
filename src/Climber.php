@@ -386,24 +386,6 @@ class Climber
 
         return $data;
     }
-
-    /**
-     * Returns some data about the leaf in a
-     * slightly more accessible format.
-     *
-     * @param array $leaf
-     * @return void
-     */
-    protected function examine(array $leaf)
-    {
-        return (object) array_merge(
-            [
-                'parent' => $leaf[0] ?? false,
-                'children' => $leaf[1] ?? false,
-            ],
-            $leaf[2]
-        );
-    }
     
     protected function bud(int $hint)
     {
