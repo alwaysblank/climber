@@ -310,29 +310,29 @@ class Climber
    *      ['data-menu', '#primary'],
    *   ]
    * ```
-   * 
+   *
    * You can remove an attribute by passing `false` as the second value:
-   * 
+   *
    * ```
    *    [
    *       ['target', '_blank'],
    *       ['target', false],
    *    ]
    * ```
-   * 
+   *
    * This would result in *no* `target` attribute appearing on the element.
-   * 
+   *
    * Subsequent attributes will override previousl ones:
-   * 
+   *
    * ```
    *    [
    *       ['data-star', 'wars'],
    *       ['data-star', 'trek'],
    *    ]
    * ```
-   * 
+   *
    * This would result in:
-   * 
+   *
    * ```
    * <element data-star="trek"></element>
    * ```
@@ -379,8 +379,8 @@ class Climber
                     );
                 } elseif (true === $value) {
                     $return .= ' ' . Z\Strings::clean(
-                        $attr, 
-                        "-", 
+                        $attr,
+                        "-",
                         "/[^[:alnum:]-]/u"
                     );
                 }
