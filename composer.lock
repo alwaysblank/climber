@@ -4,91 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "12cc9e330ccf7701e7a8747e1ebde414",
+    "content-hash": "a6f1c21f8696e9861430d4ded5bce61d",
     "packages": [
-        {
-            "name": "zenodorus/arrays",
-            "version": "1.1.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/zenodorus-tools/arrays.git",
-                "reference": "31cfbe9b98d773943b29fa53fc64ec37e52ef02d"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/zenodorus-tools/arrays/zipball/31cfbe9b98d773943b29fa53fc64ec37e52ef02d",
-                "reference": "31cfbe9b98d773943b29fa53fc64ec37e52ef02d",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=7.1"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "^6.4",
-                "squizlabs/php_codesniffer": "^3.1",
-                "zenodorus/core": "dev-master"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Zenodorus\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Ben Martinez-Bateman",
-                    "email": "ben@alwaysblank.org",
-                    "homepage": "https://alwaysblank.org"
-                }
-            ],
-            "description": "Tools for messing with arrays.",
-            "homepage": "https://zenodor.us",
-            "time": "2018-01-24T18:31:32+00:00"
-        },
-        {
-            "name": "zenodorus/strings",
-            "version": "1.0.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/zenodorus-tools/strings.git",
-                "reference": "70af4c27af6a068c0b573e0dd46995f34dc1a1b8"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/zenodorus-tools/strings/zipball/70af4c27af6a068c0b573e0dd46995f34dc1a1b8",
-                "reference": "70af4c27af6a068c0b573e0dd46995f34dc1a1b8",
-                "shasum": ""
-            },
-            "require-dev": {
-                "phpunit/phpunit": "^6.4",
-                "squizlabs/php_codesniffer": "^3.1",
-                "zenodorus/standards": "dev-master"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Zenodorus\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Ben Martinez-Bateman",
-                    "email": "ben@alwaysblank.org"
-                }
-            ],
-            "description": "Tools for messing with strings.",
-            "time": "2017-10-24T21:12:32+00:00"
-        }
-    ],
-    "packages-dev": [
         {
             "name": "doctrine/instantiator",
             "version": "1.1.0",
@@ -1598,6 +1515,49 @@
             "time": "2016-11-23T20:04:58+00:00"
         },
         {
+            "name": "zenodorus/arrays",
+            "version": "1.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/zenodorus-tools/arrays.git",
+                "reference": "31cfbe9b98d773943b29fa53fc64ec37e52ef02d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/zenodorus-tools/arrays/zipball/31cfbe9b98d773943b29fa53fc64ec37e52ef02d",
+                "reference": "31cfbe9b98d773943b29fa53fc64ec37e52ef02d",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.1"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^6.4",
+                "squizlabs/php_codesniffer": "^3.1",
+                "zenodorus/core": "dev-master"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Zenodorus\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Ben Martinez-Bateman",
+                    "email": "ben@alwaysblank.org",
+                    "homepage": "https://alwaysblank.org"
+                }
+            ],
+            "description": "Tools for messing with arrays.",
+            "homepage": "https://zenodor.us",
+            "time": "2018-01-24T18:31:32+00:00"
+        },
+        {
             "name": "zenodorus/core",
             "version": "dev-master",
             "source": {
@@ -1633,8 +1593,47 @@
             ],
             "description": "A collection of all the Zenodorus utilities.",
             "time": "2017-11-10T00:22:53+00:00"
+        },
+        {
+            "name": "zenodorus/strings",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/zenodorus-tools/strings.git",
+                "reference": "70af4c27af6a068c0b573e0dd46995f34dc1a1b8"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/zenodorus-tools/strings/zipball/70af4c27af6a068c0b573e0dd46995f34dc1a1b8",
+                "reference": "70af4c27af6a068c0b573e0dd46995f34dc1a1b8",
+                "shasum": ""
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^6.4",
+                "squizlabs/php_codesniffer": "^3.1",
+                "zenodorus/standards": "dev-master"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Zenodorus\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Ben Martinez-Bateman",
+                    "email": "ben@alwaysblank.org"
+                }
+            ],
+            "description": "Tools for messing with strings.",
+            "time": "2017-10-24T21:12:32+00:00"
         }
     ],
+    "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
@@ -1643,7 +1642,7 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": ">=7"
+        "php": ">=7.1"
     },
     "platform-dev": []
 }
