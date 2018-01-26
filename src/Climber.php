@@ -28,14 +28,39 @@ class Climber
 
     protected $tree = [];
 
+    /**
+     * These props determine CSS class names. Modifying them from outside the
+     * class will overwrite them—there is no special handling via
+     * `Climber::__set()`;
+     *
+     * @var string
+     */
     protected $topClass = 'simpleMenu';
     protected $menuClass = 'simpleMenu__menu';
     protected $itemClass = 'simpleMenu__item';
     protected $linkClass = 'simpleMenu__link';
+
+    /**
+     * These props determine element attributes. Modifying them from outside the
+     * class will append values to the arrays by `Climber::__set()`. When these
+     * arrays are processed through `Climber::attr()`, values can override each
+     * other and remove other values.
+     *
+     * @see Climber::attr()
+     *
+     * @var array
+     */
     protected $topAttr = [];
     protected $menuAttr = [];
     protected $itemAttr = [];
     protected $linkAttr = [];
+
+    /**
+     * These props contain hoooks that will be run at the appropriate stage.
+     * They are set by `Climber::hook()` and should **not* be modified directly.
+     *
+     * @var array
+     */
     protected $topHooks = [];
     protected $menuHooks = [];
     protected $itemHooks = [];
@@ -43,7 +68,8 @@ class Climber
     protected $linkHooks = [];
 
     /**
-     * All this does is set the tree.
+     * Sets up the `$tree`, and adds active classes to the appropriate leaves,
+     * if `$currentUrl` matches to a leaf target.
      *
      * @param Tree $tree
      */
@@ -108,7 +134,7 @@ class Climber
     }
 
   /**
-   * If $this is treated as a string, print out a <ul></ul>.
+   * If `Climber` is treated as a string, print out a <ul></ul>.
    *
    * @return string
    */
@@ -136,7 +162,7 @@ class Climber
    * Set a property, if that is possible.
    *
    * Requested property is only set if its name appears
-   * in `$this->setable` array.
+   * in `Climber::setable`.
    *
    * If this object has a method named `set[Property]`
    * (i.e. for the property `tree` it would be `setTree`)
