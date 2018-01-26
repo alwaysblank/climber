@@ -62,7 +62,7 @@ class Climber
              */
             $this->hook(
                 'item',
-                function($data) {
+                function ($data) {
                     if (isset($data['bud'][3])) {
                         $data['class'] = Z\Strings::addNew(
                             sprintf(
@@ -78,15 +78,14 @@ class Climber
                 }
             );
             
-            /** 
+            /**
              * Add an 'active' class to menus that contain an active item (i.e.
              * an item containing the url we're at.)
             */
             $this->hook(
                 'menu',
-                function($data) {
-                    if (
-                        $branch = Z\Arrays::pluck($data['bud'], [2, 'id'], true)
+                function ($data) {
+                    if ($branch = Z\Arrays::pluck($data['bud'], [2, 'id'], true)
                     ) {
                         // if leaf has $branch as parent and active == true
                         foreach ($this->tree->grow() as $key => $leaf) {
@@ -166,7 +165,7 @@ class Climber
 
     /**
      * Activate a leaf.
-     * 
+     *
      * This sets some stuff on leaves to make them 'active' in various ways.
      * The primary purpose of this is to highlight menu items when the user is
      * on that page.
@@ -201,10 +200,10 @@ class Climber
 
     /**
      * Get a leaf from the value of its target.
-     * 
+     *
      * This is primarily useful when you want to set active leaves for the
      * current page.
-     * 
+     *
      * If `$strict` is `true`, then it just does a direct string match test. If
      * `$strict` is `false`, then it tests the path, queries, and fragments
      * against one another with `parse_url`.
@@ -223,7 +222,7 @@ class Climber
                 $parsedTarget = parse_url($target);
                 $parsedTestTarget = parse_url($testTarget);
                 $matchPath = isset($parsedTarget['path'])
-                    && isset($parsedTestTarget['path']) 
+                    && isset($parsedTestTarget['path'])
                     ? ($parsedTarget['path'] === $parsedTestTarget['path'])
                     : true;
                 $matchQueries = isset($parsedTarget['query'])
