@@ -439,6 +439,14 @@ class Climber
         return $data;
     }
 
+    /**
+     * This takes a numeric id for a leaf, and expands it out. It will create
+     * an `<li>` wrapper, and organize the link and optional submenu inside
+     * of it.
+     *
+     * @param integer $hint
+     * @return string
+     */
     protected function bud(int $hint)
     {
         $bud = $this->tree->getLeaf($hint);
