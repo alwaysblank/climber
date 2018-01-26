@@ -22,6 +22,7 @@ class Climber
         'top',
         'menu',
         'item',
+        'itemOutput',
         'link',
     ];
 
@@ -38,6 +39,7 @@ class Climber
     protected $topHooks = [];
     protected $menuHooks = [];
     protected $itemHooks = [];
+    protected $itemOutputHooks = [];
     protected $linkHooks = [];
 
     /**
@@ -45,9 +47,65 @@ class Climber
      *
      * @param Tree $tree
      */
-    public function __construct(Tree $tree, $active = null)
+    public function __construct(Tree $tree, $currentUrl = null)
     {
         $this->tree = $tree;
+
+        if ($currentUrl) {
+            $this->activate(
+                $this->getLeafByTarget($currentUrl)
+            );
+
+            /**
+             * Add 'active' classes to items that are active (i.e. the
+             * contain the url we're at, or its ancestors.)
+             */
+            $this->hook(
+                'item',
+                function($data) {
+                    if (isset($data['bud'][3])) {
+                        $data['class'] = Z\Strings::addNew(
+                            sprintf(
+                                "%s--%s",
+                                $this->itemClass,
+                                $data['bud'][3]
+                            ),
+                            $data['class']
+                        );
+                    }
+
+                    return $data;
+                }
+            );
+            
+            /** 
+             * Add an 'active' class to menus that contain an active item (i.e.
+             * an item containing the url we're at.)
+            */
+            $this->hook(
+                'menu',
+                function($data) {
+                    if (
+                        $branch = Z\Arrays::pluck($data['bud'], [2, 'id'], true)
+                    ) {
+                        // if leaf has $branch as parent and active == true
+                        foreach ($this->tree->grow() as $key => $leaf) {
+                            $data['class'] = Z\Strings::addNew(
+                                sprintf(
+                                    "%s--%s",
+                                    $this->menuClass,
+                                    'active'
+                                ),
+                                $data['class']
+                            );
+                            break;
+                        }
+                    }
+
+                    return $data;
+                }
+            );
+        }
     }
 
   /**
@@ -106,7 +164,16 @@ class Climber
         return null;
     }
 
-
+    /**
+     * Activate a leaf.
+     * 
+     * This sets some stuff on leaves to make them 'active' in various ways.
+     * The primary purpose of this is to highlight menu items when the user is
+     * on that page.
+     *
+     * @param integer $hint
+     * @return void
+     */
     public function activate(int $hint)
     {
         if ($leaf = $this->tree->getLeaf($hint)) {
@@ -130,6 +197,51 @@ class Climber
                 unset($distance);
             }
         }
+    }
+
+    /**
+     * Get a leaf from the value of its target.
+     * 
+     * This is primarily useful when you want to set active leaves for the
+     * current page.
+     * 
+     * If `$strict` is `true`, then it just does a direct string match test. If
+     * `$strict` is `false`, then it tests the path, queries, and fragments
+     * against one another with `parse_url`.
+     *
+     * @param string $target
+     * @param boolean $strict
+     * @return void
+     */
+    public function getLeafByTarget(string $target, bool $strict = true)
+    {
+        foreach ($this->tree->grow() as $id => $leaf) {
+            $testTarget = Z\Arrays::pluck($leaf, [2, 'target']);
+            if ($testTarget === $target) {
+                return $id;
+            } elseif (!$strict) {
+                $parsedTarget = parse_url($target);
+                $parsedTestTarget = parse_url($testTarget);
+                $matchPath = isset($parsedTarget['path'])
+                    && isset($parsedTestTarget['path']) 
+                    ? ($parsedTarget['path'] === $parsedTestTarget['path'])
+                    : true;
+                $matchQueries = isset($parsedTarget['query'])
+                    && isset($parsedTestTarget['query'])
+                    ? ($parsedTarget['query'] === $parsedTestTarget['query'])
+                    : true;
+                $matchHashes = isset($parsedTarget['fragment'])
+                    && isset($parsedTestTarget['fragment'])
+                    ? ($parsedTarget['fragment'] === $parsedTestTarget['fragment'])
+                    : true;
+
+                if ($matchPath && $matchQueries && $matchHashes) {
+                    return $id;
+                }
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -206,7 +318,7 @@ class Climber
     protected function attrs(array $attrs)
     {
         if (!Z\Arrays::isEmpty($attrs)) {
-            return array_reduce($attrs, function ($carry, $current) {
+            return ' ' . array_reduce($attrs, function ($carry, $current) {
                 if (isset($current[0])) {
                     $return = false;
                     if (!isset($current[1])) {
@@ -314,7 +426,7 @@ class Climber
 
         return vsprintf(
             sprintf(
-                '<li class="%1$s" %2$s>%3$s</li>',
+                '<li class="%1$s"%2$s>%3$s</li>',
                 $itemData['class'],
                 $itemData['attrs'],
                 $itemOutput['format']
@@ -339,7 +451,7 @@ class Climber
         ]);
 
         return sprintf(
-            '<a href="%1$s" class="%2$s" %3$s>%4$s</a>',
+            '<a href="%1$s" class="%2$s"%3$s>%4$s</a>',
             $linkData['link'],
             $linkData['class'],
             $linkData['attrs'],
@@ -387,7 +499,7 @@ class Climber
         ]);
 
         return sprintf(
-            '<ul class="%1$s level-%2$s" %3$s>%4$s</ul>',
+            '<ul class="%1$s level-%2$s"%3$s>%4$s</ul>',
             $menuData['class'],
             $menuData['level'],
             $menuData['attrs'],
@@ -432,7 +544,7 @@ class Climber
         ]);
 
         $menu = sprintf(
-            '<nav class="%1$s" %2$s>%3$s</nav>',
+            '<nav class="%1$s"%2$s>%3$s</nav>',
             $topData['class'],
             $topData['attrs'],
             $this->branch($this->harvest($topData['tree']))

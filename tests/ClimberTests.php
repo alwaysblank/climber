@@ -23,7 +23,7 @@ class ClimberTest extends TestCase
     public function testBasicMenu()
     {
         // phpcs:disable Generic.Files.LineLength.TooLong
-        $expected = '<nav class="simpleMenu" ><ul class="simpleMenu__menu level-0" ><li class="simpleMenu__item" ><a href="https://california.gov" class="simpleMenu__link" >California</a></li><li class="simpleMenu__item" ><a href="https://oregon.gov" class="simpleMenu__link" >Oregon</a><ul class="simpleMenu__menu simpleMenu__menu--submenu level-1" ><li class="simpleMenu__item" ><a href="https://oregon.gov/portland" class="simpleMenu__link" >Portland</a></li><li class="simpleMenu__item" ><a href="https://oregon.gov/corvallis" class="simpleMenu__link" >Corvallis</a><ul class="simpleMenu__menu simpleMenu__menu--submenu level-2" ><li class="simpleMenu__item" ><a href="https://oregon.gov/corvallis/osu" class="simpleMenu__link" >OSU</a></li></ul></li></ul></li><li class="simpleMenu__item" ><a href="https://iowa.gov" class="simpleMenu__link" >Iowa</a></li></ul></nav>';
+        $expected = '<nav class="simpleMenu"><ul class="simpleMenu__menu level-0"><li class="simpleMenu__item"><a href="https://california.gov" class="simpleMenu__link">California</a></li><li class="simpleMenu__item"><a href="https://oregon.gov" class="simpleMenu__link">Oregon</a><ul class="simpleMenu__menu simpleMenu__menu--submenu level-1"><li class="simpleMenu__item"><a href="https://oregon.gov/portland" class="simpleMenu__link">Portland</a></li><li class="simpleMenu__item"><a href="https://oregon.gov/corvallis" class="simpleMenu__link">Corvallis</a><ul class="simpleMenu__menu simpleMenu__menu--submenu level-2"><li class="simpleMenu__item"><a href="https://oregon.gov/corvallis/osu" class="simpleMenu__link">OSU</a></li></ul></li></ul></li><li class="simpleMenu__item"><a href="https://iowa.gov" class="simpleMenu__link">Iowa</a></li></ul></nav>';
         // phpcs:enable
 
         $this->assertEquals($expected, $this->test->element(), "Simple menu HTML does not match.");
@@ -93,5 +93,53 @@ class ClimberTest extends TestCase
             return $nav;
         });
         $this->assertNotFalse(strpos($this->test->element(), ' linkHooked'), 'Cannot hook "link".');
+    }
+
+    public function testGetLeafByTarget()
+    {
+        $this->assertEquals(
+            66,
+            $this->test->getLeafByTarget('https://oregon.gov/corvallis/osu'),
+            'Cannot correctly identify leaf by target.'
+        );
+    }
+    
+    public function testActivate()
+    {
+        $activateTest = new Climber(
+            $this->tree,
+            'https://oregon.gov/corvallis/osu'
+        );
+        $this->assertEquals(
+            'current',
+            $activateTest->tree->getLeafContent(66, 3),
+            'Leaf 66 is not active with "current".'
+        );
+        $this->assertEquals(
+            'parent',
+            $activateTest->tree->getLeafContent(55, 3),
+            'Leaf 55 is not active with "parent".'
+        );
+        $this->assertEquals(
+            'ancestor',
+            $activateTest->tree->getLeafContent(22, 3),
+            'Leaf 2 is not active with "ancestor".'
+        );
+    }
+
+    public function testActivateElement()
+    {
+        $activateElementTest = new Climber(
+            $this->tree,
+            'https://oregon.gov/corvallis/osu'
+        );
+
+        $this->assertEquals(
+            // phpcs:disable Generic.Files.LineLength.TooLong
+            '<nav class="simpleMenu"><ul class="simpleMenu__menu level-0"><li class="simpleMenu__item"><a href="https://california.gov" class="simpleMenu__link">California</a></li><li class="simpleMenu__item simpleMenu__item--ancestor"><a href="https://oregon.gov" class="simpleMenu__link">Oregon</a><ul class="simpleMenu__menu simpleMenu__menu--submenu simpleMenu__menu--active level-1"><li class="simpleMenu__item"><a href="https://oregon.gov/portland" class="simpleMenu__link">Portland</a></li><li class="simpleMenu__item simpleMenu__item--parent"><a href="https://oregon.gov/corvallis" class="simpleMenu__link">Corvallis</a><ul class="simpleMenu__menu simpleMenu__menu--submenu simpleMenu__menu--active level-2"><li class="simpleMenu__item simpleMenu__item--current"><a href="https://oregon.gov/corvallis/osu" class="simpleMenu__link">OSU</a></li></ul></li></ul></li><li class="simpleMenu__item"><a href="https://iowa.gov" class="simpleMenu__link">Iowa</a></li></ul></nav>',
+            // phpcs:enable
+            $activateElementTest->element(),
+            'Menus were not properly acivated.'
+        );
     }
 }
