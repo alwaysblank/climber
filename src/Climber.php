@@ -446,7 +446,7 @@ class Climber
             'link' => Z\Arrays::pluck($bud, [2, 'target']),
             'class' => $this->linkClass,
             'attrs' => $this->attrs($this->linkAttr),
-            'text' => Z\Arrays::pluck($bud, [2, 'name']),
+            'content' => Z\Arrays::pluck($bud, [2, 'name']),
         ]);
 
         return sprintf(
@@ -454,7 +454,7 @@ class Climber
             $linkData['link'],
             $linkData['class'],
             $linkData['attrs'],
-            $linkData['text']
+            $linkData['content']
         );
     }
 
