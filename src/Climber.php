@@ -306,9 +306,35 @@ class Climber
    * ```
    *   [
    *      ['target', '_blank'],
-   *      ['disabled']
-   *      ['data-menu', '#primary']
+   *      ['disabled'],
+   *      ['data-menu', '#primary'],
    *   ]
+   * ```
+   * 
+   * You can remove an attribute by passing `false` as the second value:
+   * 
+   * ```
+   *    [
+   *       ['target', '_blank'],
+   *       ['target', false],
+   *    ]
+   * ```
+   * 
+   * This would result in *no* `target` attribute appearing on the element.
+   * 
+   * Subsequent attributes will override previousl ones:
+   * 
+   * ```
+   *    [
+   *       ['data-star', 'wars'],
+   *       ['data-star', 'trek'],
+   *    ]
+   * ```
+   * 
+   * This would result in:
+   * 
+   * ```
+   * <element data-star="trek"></element>
    * ```
    *
    * @param array $attrs          Collection of attribute pairs in an array.
@@ -317,24 +343,50 @@ class Climber
     protected function attrs(array $attrs)
     {
         if (!Z\Arrays::isEmpty($attrs)) {
-            return ' ' . array_reduce($attrs, function ($carry, $current) {
-                if (isset($current[0])) {
-                    $return = false;
-                    if (!isset($current[1])) {
-                        $return = Z\Strings::clean($current[0], "-", "/[^[:alnum:]-]/u");
-                    } else {
-                        $return = sprintf(
-                            '%s="%s"',
-                            Z\Strings::clean($current[0], "-", "/[^[:alnum:]-]/u"),
-                            htmlspecialchars($current[1], ENT_QUOTES)
-                        );
-                    }
-
-                    return $return ? Z\Strings::addNew($return, $carry) : $carry;
+            /**
+             * Do a little logic on our attrs so we know they're correct.
+             */
+            $processed = [];
+            foreach ($attrs as $key => $value) {
+                if (!is_string($value[0])) {
+                    // Only strings can be attributes.
+                    continue;
                 }
 
-                return $carry;
-            }, '');
+                if (isset($value[1])) {
+                    if ($value[1] === false && isset($processed[$value[0]])) {
+                        // If this attr is set to false, remove it.
+                        unset($processed[$value[0]]);
+                    } elseif (is_string($value[1])) {
+                        // Otherwise, process it
+                        $processed[$value[0]] = $value[1];
+                    }
+                } else {
+                    $processed[$value[0]] = true;
+                }
+            }
+
+            /**
+             * Generate a string of all our attrs.
+             */
+            $return = null;
+            foreach ($processed as $attr => $value) {
+                if (is_string($value)) {
+                    $return .= ' ' . sprintf(
+                        '%s="%s"',
+                        Z\Strings::clean($attr, "-", "/[^[:alnum:]-]/u"),
+                        htmlspecialchars($value, ENT_QUOTES)
+                    );
+                } elseif (true === $value) {
+                    $return .= ' ' . Z\Strings::clean(
+                        $attr, 
+                        "-", 
+                        "/[^[:alnum:]-]/u"
+                    );
+                }
+            }
+
+            return $return;
         }
 
         return null;
@@ -386,7 +438,7 @@ class Climber
 
         return $data;
     }
-    
+
     protected function bud(int $hint)
     {
         $bud = $this->tree->getLeaf($hint);

@@ -65,6 +65,25 @@ class ClimberTest extends TestCase
         $this->assertNotFalse(strpos($this->test->element(), 'data-link="new link"'), 'Cannot set `$linkAttr`.');
     }
 
+    public function testRemoveAttr()
+    {
+        $this->test->topAttr = ['data-star', 'wars'];
+        $this->assertNotFalse(strpos($this->test->element(), 'data-star="wars"'), 'Attrs are not properly added.');
+
+        $this->test->topAttr = ['data-star', false];
+        $this->assertFalse(strpos($this->test->element(), 'data-star'), 'Attrs are not properly removed.');
+    }
+
+    public function testOverrideAttr()
+    {
+        $this->test->topAttr = ['data-star', 'wars'];
+        $this->assertNotFalse(strpos($this->test->element(), 'data-star="wars"'), 'Attrs are not properly added.');
+
+        $this->test->topAttr = ['data-star', 'trek'];
+        $this->assertNotFalse(strpos($this->test->element(), 'data-star="trek"'), 'Attrs are not properly added.');
+        $this->assertFalse(strpos($this->test->element(), 'data-star="wars"'), 'Attrs are not properly added.');
+    }
+
     /**
      * @depends testBasicMenu
      */
