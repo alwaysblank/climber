@@ -115,15 +115,17 @@ class Climber
                     ) {
                         // if leaf has $branch as parent and active == true
                         foreach ($this->tree->grow() as $key => $leaf) {
-                            $data['class'] = Z\Strings::addNew(
-                                sprintf(
-                                    "%s--%s",
-                                    $this->menuClass,
-                                    'active'
-                                ),
-                                $data['class']
-                            );
-                            break;
+                            if (isset($leaf[3])
+                                && (int) $branch === (int) $leaf[0]) {
+                                $data['class'] = Z\Strings::addNew(
+                                    sprintf(
+                                        "%s--%s",
+                                        $this->menuClass,
+                                        'active'
+                                    ),
+                                    $data['class']
+                                );
+                            }
                         }
                     }
 
