@@ -124,7 +124,7 @@ class ClimberTest extends TestCase
 
     public function testGetLeafByTarget()
     {
-        $this->assertEquals(
+        $this->assertContains(
             66,
             $this->test->getLeafByTarget('https://oregon.gov/corvallis/osu'),
             'Cannot correctly identify leaf by target.'

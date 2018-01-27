@@ -78,9 +78,11 @@ class Climber
         $this->tree = $tree;
 
         if ($currentUrl) {
-            $this->activate(
-                $this->getLeafByTarget($currentUrl)
-            );
+            if (count($currentLeaves = $this->getLeafByTarget($currentUrl)) > 0) {
+                foreach ($currentLeaves as $leaf) {
+                    $this->activate($leaf);
+                }
+            }
 
             /**
              * Add 'active' classes to items that are active (i.e. the
@@ -227,10 +229,11 @@ class Climber
     }
 
     /**
-     * Get a leaf from the value of its target.
+     * Gets zero or more leaves, based on their target.
      *
      * This is primarily useful when you want to set active leaves for the
-     * current page.
+     * current page. It returns an array containing all leaves with this
+     * target. This means the array can contain no leaves!
      *
      * If `$strict` is `true`, then it just does a direct string match test. If
      * `$strict` is `false`, then it tests the path, queries, and fragments
@@ -238,14 +241,15 @@ class Climber
      *
      * @param string $target
      * @param boolean $strict
-     * @return void
+     * @return array
      */
     public function getLeafByTarget(string $target, bool $strict = true)
     {
+        $leaves = [];
         foreach ($this->tree->grow() as $id => $leaf) {
             $testTarget = Z\Arrays::pluck($leaf, [2, 'target']);
             if ($testTarget === $target) {
-                return $id;
+                $leaves[] = $id;
             } elseif (!$strict) {
                 $parsedTarget = parse_url($target);
                 $parsedTestTarget = parse_url($testTarget);
@@ -263,12 +267,12 @@ class Climber
                     : true;
 
                 if ($matchPath && $matchQueries && $matchHashes) {
-                    return $id;
+                    $leaves[] = $id;
                 }
             }
         }
 
-        return false;
+        return $leaves;
     }
 
     /**
