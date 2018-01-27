@@ -103,7 +103,7 @@ class Climber
                     return $data;
                 }
             );
-            
+
             /**
              * Add an 'active' class to menus that contain an active item (i.e.
              * an item containing the url we're at.)
@@ -211,11 +211,11 @@ class Climber
                     case 0:
                         $distance = 'current';
                         break;
-                    
+
                     case 1:
                         $distance = 'parent';
                         break;
-                    
+
                     default:
                         $distance = 'ancestor';
                         break;
@@ -557,7 +557,7 @@ class Climber
             }
             return ($a_order < $b_order) ? -1 : 1;
         });
-        
+
         $menuData = $this->runHook('menu', [
             'class' => $level > 0
                 ? sprintf('%1$s %1$s--submenu', $this->menuClass)
