@@ -77,4 +77,51 @@ class WP_Data
     }
 }
 
+/**
+ * This pretends to be the actual function. If it is given a valid `$menu`, it
+ * returns (always the same) faked menu data.
+ *
+ * @param integer|string|WP_Term $menu
+ * @return array|false
+ */
+function wp_get_nav_menu_items($menu) {
+    if (is_string($menu) || is_integer($menu) || is_a('WP_Term', $menu)) {
+        return WP_Data::get();
+    }
+
+    return false;
+}
+
+/**
+ * This pretends to be the actual function. It just returns an array that can
+ * be successfully passed to `get_term()`.
+ *
+ * @return array
+ */
+function get_nav_menu_locations()
+{
+    return ['primary_navigation' => 1];
+}
+
+class WP_Term {
+    // Nobody here but us chickens.
+}
+
+/**
+ * This pretends to be the actual function. It just returns an object that will
+ * validated as `WP_Term` object.
+ *
+ * @param integer $integer
+ * @param string $type
+ * @return void
+ */
+function get_term($integer, $type)
+{
+    if (is_integer($integer) && is_string($type)) {
+        return new WP_Term;
+    }
+
+    return false;
+}
+
 // phpcs:enable

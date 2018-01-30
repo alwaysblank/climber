@@ -4,8 +4,91 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "a6f1c21f8696e9861430d4ded5bce61d",
+    "content-hash": "c2c09f94e346b540e45b3af9657ede01",
     "packages": [
+        {
+            "name": "zenodorus/arrays",
+            "version": "1.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/zenodorus-tools/arrays.git",
+                "reference": "31cfbe9b98d773943b29fa53fc64ec37e52ef02d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/zenodorus-tools/arrays/zipball/31cfbe9b98d773943b29fa53fc64ec37e52ef02d",
+                "reference": "31cfbe9b98d773943b29fa53fc64ec37e52ef02d",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.1"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^6.4",
+                "squizlabs/php_codesniffer": "^3.1",
+                "zenodorus/core": "dev-master"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Zenodorus\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Ben Martinez-Bateman",
+                    "email": "ben@alwaysblank.org",
+                    "homepage": "https://alwaysblank.org"
+                }
+            ],
+            "description": "Tools for messing with arrays.",
+            "homepage": "https://zenodor.us",
+            "time": "2018-01-24T18:31:32+00:00"
+        },
+        {
+            "name": "zenodorus/strings",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/zenodorus-tools/strings.git",
+                "reference": "70af4c27af6a068c0b573e0dd46995f34dc1a1b8"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/zenodorus-tools/strings/zipball/70af4c27af6a068c0b573e0dd46995f34dc1a1b8",
+                "reference": "70af4c27af6a068c0b573e0dd46995f34dc1a1b8",
+                "shasum": ""
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^6.4",
+                "squizlabs/php_codesniffer": "^3.1",
+                "zenodorus/standards": "dev-master"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Zenodorus\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Ben Martinez-Bateman",
+                    "email": "ben@alwaysblank.org"
+                }
+            ],
+            "description": "Tools for messing with strings.",
+            "time": "2017-10-24T21:12:32+00:00"
+        }
+    ],
+    "packages-dev": [
         {
             "name": "doctrine/instantiator",
             "version": "1.1.0",
@@ -263,16 +346,16 @@
         },
         {
             "name": "phpdocumentor/reflection-docblock",
-            "version": "4.2.0",
+            "version": "4.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpDocumentor/ReflectionDocBlock.git",
-                "reference": "66465776cfc249844bde6d117abff1d22e06c2da"
+                "reference": "94fd0001232e47129dd3504189fa1c7225010d08"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpDocumentor/ReflectionDocBlock/zipball/66465776cfc249844bde6d117abff1d22e06c2da",
-                "reference": "66465776cfc249844bde6d117abff1d22e06c2da",
+                "url": "https://api.github.com/repos/phpDocumentor/ReflectionDocBlock/zipball/94fd0001232e47129dd3504189fa1c7225010d08",
+                "reference": "94fd0001232e47129dd3504189fa1c7225010d08",
                 "shasum": ""
             },
             "require": {
@@ -310,7 +393,7 @@
                 }
             ],
             "description": "With this component, a library can provide support for annotations via DocBlocks or otherwise retrieve information that is embedded in a DocBlock.",
-            "time": "2017-11-27T17:38:31+00:00"
+            "time": "2017-11-30T07:14:17+00:00"
         },
         {
             "name": "phpdocumentor/type-resolver",
@@ -1466,16 +1549,16 @@
         },
         {
             "name": "webmozart/assert",
-            "version": "1.2.0",
+            "version": "1.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webmozart/assert.git",
-                "reference": "2db61e59ff05fe5126d152bd0655c9ea113e550f"
+                "reference": "0df1908962e7a3071564e857d86874dad1ef204a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webmozart/assert/zipball/2db61e59ff05fe5126d152bd0655c9ea113e550f",
-                "reference": "2db61e59ff05fe5126d152bd0655c9ea113e550f",
+                "url": "https://api.github.com/repos/webmozart/assert/zipball/0df1908962e7a3071564e857d86874dad1ef204a",
+                "reference": "0df1908962e7a3071564e857d86874dad1ef204a",
                 "shasum": ""
             },
             "require": {
@@ -1512,50 +1595,7 @@
                 "check",
                 "validate"
             ],
-            "time": "2016-11-23T20:04:58+00:00"
-        },
-        {
-            "name": "zenodorus/arrays",
-            "version": "1.1.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/zenodorus-tools/arrays.git",
-                "reference": "31cfbe9b98d773943b29fa53fc64ec37e52ef02d"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/zenodorus-tools/arrays/zipball/31cfbe9b98d773943b29fa53fc64ec37e52ef02d",
-                "reference": "31cfbe9b98d773943b29fa53fc64ec37e52ef02d",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=7.1"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "^6.4",
-                "squizlabs/php_codesniffer": "^3.1",
-                "zenodorus/core": "dev-master"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Zenodorus\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Ben Martinez-Bateman",
-                    "email": "ben@alwaysblank.org",
-                    "homepage": "https://alwaysblank.org"
-                }
-            ],
-            "description": "Tools for messing with arrays.",
-            "homepage": "https://zenodor.us",
-            "time": "2018-01-24T18:31:32+00:00"
+            "time": "2018-01-29T19:49:41+00:00"
         },
         {
             "name": "zenodorus/core",
@@ -1593,47 +1633,8 @@
             ],
             "description": "A collection of all the Zenodorus utilities.",
             "time": "2017-11-10T00:22:53+00:00"
-        },
-        {
-            "name": "zenodorus/strings",
-            "version": "1.0.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/zenodorus-tools/strings.git",
-                "reference": "70af4c27af6a068c0b573e0dd46995f34dc1a1b8"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/zenodorus-tools/strings/zipball/70af4c27af6a068c0b573e0dd46995f34dc1a1b8",
-                "reference": "70af4c27af6a068c0b573e0dd46995f34dc1a1b8",
-                "shasum": ""
-            },
-            "require-dev": {
-                "phpunit/phpunit": "^6.4",
-                "squizlabs/php_codesniffer": "^3.1",
-                "zenodorus/standards": "dev-master"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Zenodorus\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Ben Martinez-Bateman",
-                    "email": "ben@alwaysblank.org"
-                }
-            ],
-            "description": "Tools for messing with strings.",
-            "time": "2017-10-24T21:12:32+00:00"
         }
     ],
-    "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {

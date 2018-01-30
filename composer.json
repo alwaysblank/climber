@@ -19,6 +19,9 @@
         "squizlabs/php_codesniffer": "^3.2"
 
     },
+    "autoload-dev": {
+        "files": ["tests/shims.php"]
+    },
     "autoload": {
         "psr-4": {
             "Livy\\Climber\\": "src"

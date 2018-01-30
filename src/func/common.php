@@ -1,4 +1,7 @@
 <?php
+use \Livy\Climber;
+
+$GLOBALS['livy_climber_helper_func_loaded']['common'] = true;
 
 /**
  * Returns a Climber object.
@@ -10,9 +13,9 @@
  */
 function pulley__get_menu($spotter, string $currentUrl = null)
 {
-    if (is_subclass_of($spotter, __NAMESPACE__.'\\Spotter\\Spotter')) {
-        return new Climber(
-            new Tree(
+    if (is_subclass_of($spotter, 'Livy\\Climber\\Spotter\\Spotter')) {
+        return new Climber\Climber(
+            new Climber\Tree(
                 $spotter
             )
         );

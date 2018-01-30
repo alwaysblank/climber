@@ -27,7 +27,8 @@
  * functions.
  */
 
-use \Livy\Climber as Climber;
+// Know whether or not we loaded these files.
+$GLOBALS['livy_climber_helper_func_loaded']['base'] = true;
 
 include_once(dirname(__FILE__) . '/common.php');
 

@@ -2,8 +2,6 @@
 namespace Livy\Climber;
 
 use \PHPUnit\Framework\TestCase;
-
-include_once 'shims.php';
 // phpcs:enable
 
 class TreeTest extends TestCase
