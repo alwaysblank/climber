@@ -24,7 +24,8 @@ $GLOBALS['livy_climber_helper_func_loaded']['wp'] = true;
 function pulley__wp_get_menu($menu, string $currentUrl = null)
 {
     return pulley__get_menu(
-        new Spotter\WordPress(wp_get_nav_menu_items($menu))
+        new Climber\Spotter\WordPress(wp_get_nav_menu_items($menu)),
+        $currentUrl
     );
 }
 

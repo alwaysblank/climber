@@ -1,8 +1,15 @@
 <?php // phpcs:disable PSR1.Files.SideEffects.FoundWithSymbols
 use \PHPUnit\Framework\TestCase;
+
+/**
+ * Force reload of function loader, so that it will pick up on our fake
+ * functions and allow us to correctly test for context-specific functions.
+ */ 
+
+include dirname(__FILE__) . '/../src/func/function_loader.php';
 // phpcs:enable
 
-class ClimberTest extends TestCase
+class FunctionTest extends TestCase
 {
     protected function setUp()
     {
@@ -39,30 +46,72 @@ class ClimberTest extends TestCase
 
     public function testFunctionCommonEcho()
     {
-        // phpcs:disable Generic.Files.LineLength.TooLong
-        $expected = '<nav class="simpleMenu"><ul class="simpleMenu__menu level-0"><li class="simpleMenu__item"><a href="https://california.gov" class="simpleMenu__link">California</a></li><li class="simpleMenu__item"><a href="https://oregon.gov" class="simpleMenu__link">Oregon</a><ul class="simpleMenu__menu simpleMenu__menu--submenu level-1"><li class="simpleMenu__item"><a href="https://oregon.gov/portland" class="simpleMenu__link">Portland</a></li><li class="simpleMenu__item"><a href="https://oregon.gov/corvallis" class="simpleMenu__link">Corvallis</a><ul class="simpleMenu__menu simpleMenu__menu--submenu level-2"><li class="simpleMenu__item"><a href="https://oregon.gov/corvallis/osu" class="simpleMenu__link">OSU</a></li></ul></li></ul></li><li class="simpleMenu__item"><a href="https://iowa.gov" class="simpleMenu__link">Iowa</a></li></ul></nav>';
-        // phpcs:enable
-
-        $this->assertEquals($expected, pulley__get_menu($this->spotter), "Menu strings do not match.");
+        $this->expectOutputString(\Storage::$MenuStringExpected);
+        pulley__menu($this->spotter);
     }
 
     /**
      * WordPress helpers.
      */
 
-    // public function testFunctionsWordPressLoad()
-    // {
-    //     $this->assertTrue(
-    //         function_exists('wp_get_nav_menu_items'),
-    //         "`wp_get_nav_menu_items` does not exist."
-    //     );
-    //     $this->assertTrue(
-    //         isset($GLOBALS['livy_climber_helper_func_loaded']['wp']),
-    //         "WP helper global not set."
-    //     );
-    //     $this->assertTrue(
-    //         $GLOBALS['livy_climber_helper_func_loaded']['wp'],
-    //         "WP helper global not true."
-    //     );
-    // }
+    public function testFunctionsWordPressLoad()
+    {
+        $this->assertTrue(
+            function_exists('wp_get_nav_menu_items'),
+            "`wp_get_nav_menu_items` does not exist."
+        );
+        $this->assertTrue(
+            isset($GLOBALS['livy_climber_helper_func_loaded']['wp']),
+            "WP helper global not set."
+        );
+        $this->assertTrue(
+            $GLOBALS['livy_climber_helper_func_loaded']['wp'],
+            "WP helper global not true."
+        );
+    }
+
+    public function testFunctionsWordPressGet()
+    {
+        $this->assertInstanceOf(
+            'Livy\Climber\Climber', 
+            pulley__wp_get_menu(1),
+            "WP helper cannot get menu."
+        );
+    }
+
+    public function testFunctionWordPressEcho()
+    {
+        $this->expectOutputString(\Storage::$MenuStringExpected);
+        pulley__wp_menu(1);
+    }
+    
+    public function testFunctionsWordPressGetByLocation()
+    {
+        $this->assertInstanceOf(
+            'Livy\Climber\Climber', 
+            pulley__wp_get_menu_by_location('primary_navigation'),
+            "WP helper cannot get menu by location."
+        );
+    }
+
+    public function testFunctionWordPressEchoByLocation()
+    {
+        $this->expectOutputString(\Storage::$MenuStringExpected);
+        pulley__wp_menu_by_location('primary_navigation');
+    }
+    
+    public function testFunctionWordPressEchoActivated()
+    {
+        $this->expectOutputString(\Storage::$ActivatedMenuStringExpected);
+        pulley__wp_menu(1, 'https://oregon.gov/corvallis/osu');
+    }
+    
+    public function testFunctionWordPressEchoByLocationActivated()
+    {
+        $this->expectOutputString(\Storage::$ActivatedMenuStringExpected);
+        pulley__wp_menu_by_location(
+            'primary_navigation',
+            'https://oregon.gov/corvallis/osu'
+        );
+    }
 }

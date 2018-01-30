@@ -20,7 +20,7 @@
 
     },
     "autoload-dev": {
-        "files": ["tests/shims.php"]
+        "files": ["tests/shims.php", "tests/storage.php"]
     },
     "autoload": {
         "psr-4": {

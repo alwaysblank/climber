@@ -17,7 +17,8 @@ function pulley__get_menu($spotter, string $currentUrl = null)
         return new Climber\Climber(
             new Climber\Tree(
                 $spotter
-            )
+            ),
+            $currentUrl
         );
     } else {
         return false;

@@ -85,7 +85,7 @@ class WP_Data
  * @return array|false
  */
 function wp_get_nav_menu_items($menu) {
-    if (is_string($menu) || is_integer($menu) || is_a('WP_Term', $menu)) {
+    if (is_string($menu) || is_integer($menu) || is_a($menu, 'WP_Term')) {
         return WP_Data::get();
     }
 
