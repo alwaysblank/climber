@@ -2,6 +2,7 @@
 namespace Livy\Climber;
 
 use \PHPUnit\Framework\TestCase;
+
 // phpcs:enable
 
 class TreeTest extends TestCase

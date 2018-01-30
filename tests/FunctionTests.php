@@ -1,10 +1,13 @@
 <?php // phpcs:disable PSR1.Files.SideEffects.FoundWithSymbols
+
+namespace Livy\Climber;
+
 use \PHPUnit\Framework\TestCase;
 
 /**
  * Force reload of function loader, so that it will pick up on our fake
  * functions and allow us to correctly test for context-specific functions.
- */ 
+ */
 
 include dirname(__FILE__) . '/../src/func/function_loader.php';
 // phpcs:enable
@@ -13,11 +16,11 @@ class FunctionTest extends TestCase
 {
     protected function setUp()
     {
-        $this->spotter = new Livy\Climber\Spotter\WordPress(
+        $this->spotter = new Spotter\WordPress(
             \WP_Data::get()
         );
-        $this->tree = new Livy\Climber\Tree($this->spotter);
-        $this->test = new Livy\Climber\Climber($this->tree);
+        $this->tree = new Tree($this->spotter);
+        $this->test = new Climber($this->tree);
     }
 
     public function testFunctionsLoad()
@@ -39,15 +42,15 @@ class FunctionTest extends TestCase
     public function testFunctionsCommonGet()
     {
         $this->assertInstanceOf(
-            'Livy\Climber\Climber', 
-            pulley__get_menu($this->spotter)
+            __NAMESPACE__.'\\Climber',
+            \pulley__get_menu($this->spotter)
         );
     }
 
     public function testFunctionCommonEcho()
     {
         $this->expectOutputString(\Storage::$MenuStringExpected);
-        pulley__menu($this->spotter);
+        \pulley__menu($this->spotter);
     }
 
     /**
@@ -73,8 +76,8 @@ class FunctionTest extends TestCase
     public function testFunctionsWordPressGet()
     {
         $this->assertInstanceOf(
-            'Livy\Climber\Climber', 
-            pulley__wp_get_menu(1),
+            __NAMESPACE__.'\\Climber',
+            \pulley__wp_get_menu(1),
             "WP helper cannot get menu."
         );
     }
@@ -82,14 +85,14 @@ class FunctionTest extends TestCase
     public function testFunctionWordPressEcho()
     {
         $this->expectOutputString(\Storage::$MenuStringExpected);
-        pulley__wp_menu(1);
+        \pulley__wp_menu(1);
     }
     
     public function testFunctionsWordPressGetByLocation()
     {
         $this->assertInstanceOf(
-            'Livy\Climber\Climber', 
-            pulley__wp_get_menu_by_location('primary_navigation'),
+            __NAMESPACE__.'\\Climber',
+            \pulley__wp_get_menu_by_location('primary_navigation'),
             "WP helper cannot get menu by location."
         );
     }
@@ -97,19 +100,19 @@ class FunctionTest extends TestCase
     public function testFunctionWordPressEchoByLocation()
     {
         $this->expectOutputString(\Storage::$MenuStringExpected);
-        pulley__wp_menu_by_location('primary_navigation');
+        \pulley__wp_menu_by_location('primary_navigation');
     }
     
     public function testFunctionWordPressEchoActivated()
     {
         $this->expectOutputString(\Storage::$ActivatedMenuStringExpected);
-        pulley__wp_menu(1, 'https://oregon.gov/corvallis/osu');
+        \pulley__wp_menu(1, 'https://oregon.gov/corvallis/osu');
     }
     
     public function testFunctionWordPressEchoByLocationActivated()
     {
         $this->expectOutputString(\Storage::$ActivatedMenuStringExpected);
-        pulley__wp_menu_by_location(
+        \pulley__wp_menu_by_location(
             'primary_navigation',
             'https://oregon.gov/corvallis/osu'
         );

@@ -1,7 +1,9 @@
 <?php
 use \Livy\Climber;
 
+// phpcs:disable
 $GLOBALS['livy_climber_helper_func_loaded']['common'] = true;
+// phpcs:enable
 
 /**
  * Returns a Climber object.

@@ -84,7 +84,8 @@ class WP_Data
  * @param integer|string|WP_Term $menu
  * @return array|false
  */
-function wp_get_nav_menu_items($menu) {
+function wp_get_nav_menu_items($menu)
+{
     if (is_string($menu) || is_integer($menu) || is_a($menu, 'WP_Term')) {
         return WP_Data::get();
     }
@@ -103,7 +104,8 @@ function get_nav_menu_locations()
     return ['primary_navigation' => 1];
 }
 
-class WP_Term {
+class WP_Term
+{
     // Nobody here but us chickens.
 }
 

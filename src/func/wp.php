@@ -1,11 +1,13 @@
 <?php
 use \Livy\Climber;
 
+// phpcs:disable
 $GLOBALS['livy_climber_helper_func_loaded']['wp'] = true;
+// phpcs:enable
 
 /**
- * This is a set of helper functions for WordPress! 
- * 
+ * This is a set of helper functions for WordPress!
+ *
  * @link https://developer.wordpress.org/reference/functions/wp_get_nav_menu_items/
  * @link https://developer.wordpress.org/reference/functions/get_nav_menu_locations/
  * @link https://developer.wordpress.org/reference/functions/get_term/
