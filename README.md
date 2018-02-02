@@ -226,3 +226,175 @@ $Climber->topAttr = ['data-star', false];
 
 //<nav> ...
 ```
+
+## That's Too Complicated
+
+I agree! Fortunately there are some nice, clean, convenience functions to help
+do what you want without filling your code up with all those Classes and stuff.
+
+*(This list will expand as necessary. If you think there should be a function
+here that isn't here, open an issue or submit a PR to add it!)*
+
+All conveninece functions begin with `pulley__`. They follow a convention
+(borrowed from WordPress): Functions named `get_something` will return a
+value, while functions simply named `something` will echo that value. For this
+reason, these functions often come in pairs. If they don't, it's probably
+because the `get_` version returns something that can't be echoed.
+
+### General
+
+These functions will work in any context, but they require you to pass a valid
+Spotter.
+
+#### pulley__get_menu()
+
+```php
+pulley__get_menu(
+  Spotter   $Spotter,
+  string    $currentUrl = null
+)
+```
+
+##### Arguments
+
+- **$Spotter** - _Spotter_
+  An instance of `Spotter` that applies to the context you're calling this in.
+- **$currentUrl** - _string_
+  The URL you're currently act, for activating the correct Tree branch.
+  Default: `null`.
+
+##### Returns
+
+_Climber | false_ A Climber object if successful, boolean `false` otherwise.
+
+_
+
+#### pulley__menu()
+
+```php
+pulley__menu(
+  Spotter    $Spotter,
+  string     $currentUrl = null
+)
+```
+
+The same as `pulley__get_menu()`, except that this will echo the menu
+automatically.
+
+##### Arguments
+
+- **$Spotter** - _Spotter_
+  An instance of `Spotter` that applies to the context you're calling this in.
+- **$currentUrl** - _string_
+  The URL you're currently act, for activating the correct Tree branch.
+  Default: `null`.
+
+##### Returns
+
+_string | false_ HTML string of the menu if successful, boolean `false`
+otherwise.
+
+
+### WordPress
+
+These functions will only work with WordPress (in fact, Climber will only load
+them if it believes it is being used in a WordPress context). Because Climber
+comes packaged with a WordPress Spotter, there's no need to manually pass in
+a Spotter!
+
+#### pulley__wp_get_menu()
+
+```php
+pulley__wp_get_menu(
+  int|string|WP_Term     $menu,
+  string                 $currentUrl = null
+)
+```
+
+Returns a `Climber` for the `$menu` passed to it.
+
+##### Arguments
+
+- **$menu** - _int|string|WP_Term_
+  The value of `$menu` can a menu ID, slug, name, or object. More specifically,
+  it can be any value that [`wp_get_nav_menu_items()`](https://developer.wordpress.org/reference/functions/wp_get_nav_menu_items/)
+  would accept as a menu identifier.
+- **$currentUrl** - _string_
+  The URL you're currently act, for activating the correct Tree branch.
+  Default: `null`.
+
+##### Returns
+
+_Climber | false_ A Climber object if successful, boolean `false` otherwise.
+
+#### pulley__wp_menu()
+
+```php
+pulley__wp_menu(
+  int|string|WP_Term     $menu,
+  string                 $currentUrl = null
+)
+```
+Echoing version of `pully__wp_get_menu()`.
+
+##### Arguments
+
+- **$menu** - _int|string|WP_Term_
+  The value of `$menu` can a menu ID, slug, name, or object. More specifically,
+  it can be any value that [`wp_get_nav_menu_items()`](https://developer.wordpress.org/reference/functions/wp_get_nav_menu_items/)
+  would accept as a menu identifier.
+- **$currentUrl** - _string_
+  The URL you're currently act, for activating the correct Tree branch.
+  Default: `null`.
+
+##### Returns
+
+_string | false_ HTML string of the menu if successful, boolean `false`
+otherwise.
+
+#### pulley__wp_get_menu_by_location()
+
+```php
+function pulley__wp_get_menu_by_location(
+    string    $location,
+    string    $currentUrl = null
+)
+```
+
+Get a menu based on its location.
+
+##### Arguments
+
+- **$location** - _string_
+  The name of a $location, as defined in as defined in [`register_nav_menus()`](https://codex.wordpress.org/Function_Reference/register_nav_menus).
+- **$currentUrl** - _string_
+  The URL you're currently act, for activating the correct Tree branch.
+  Default: `null`.
+
+##### Returns
+
+_Climber | false_ A Climber object if successful, boolean `false` otherwise.
+
+#### pulley__wp_menu_by_location()
+
+```php
+function pulley__wp_menu_by_location(
+    string    $location,
+    string    $currentUrl = null
+)
+```
+
+Same as `pulley__wp_get_menu_by_location()`, just echoes.
+
+##### Arguments
+
+- **$location** - _string_
+  The name of a $location, as defined in as defined in [`register_nav_menus()`](https://codex.wordpress.org/Function_Reference/register_nav_menus).
+- **$currentUrl** - _string_
+  The URL you're currently act, for activating the correct Tree branch.
+  Default: `null`.
+
+##### Returns
+
+_string | false_ HTML string of the menu if successful, boolean `false`
+otherwise.
