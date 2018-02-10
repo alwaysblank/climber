@@ -36,7 +36,7 @@ abstract class ClimberAPI
      * @param string $property  Name of property to get.
      * @return mixed            Returns bool `false` if property does not exist.
      */
-    abstract public function __get(string $property);
+    abstract public function __get(string $property); a
 
     /**
      * Set a property, if that is possible.
