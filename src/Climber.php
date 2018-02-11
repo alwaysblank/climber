@@ -4,7 +4,7 @@ namespace Livy\Climber;
 
 use \Zenodorus as Z;
 
-class Climber extends API\ClimberAPI
+class Climber implements API\ClimberAPI
 {
     protected $setable = [
       'tree',
@@ -131,61 +131,6 @@ class Climber extends API\ClimberAPI
         }
     }
 
-    public function __toString()
-    {
-        return $this->element();
-    }
-
-    public function __get(string $property)
-    {
-        if (property_exists($this, $property)) {
-            return $this->$property;
-        }
-
-        return null;
-    }
-    
-    public function __set(string $property, $value = null)
-    {
-        if (in_array($property, $this->setable)) {
-            $setMethod = sprintf("set%s", ucfirst($property));
-            if (method_exists($this, $setMethod)) {
-                $value = call_user_func([$this, $setMethod], $value, $property);
-            }
-
-            $this->$property = $value;
-
-            return $this->$property;
-        }
-
-        return null;
-    }
-
-    public function activate(int $hint)
-    {
-        if ($leaf = $this->tree->getLeaf($hint)) {
-            $path = $this->tree->getLeafPath($hint);
-            $path[] = $hint;
-            foreach (array_reverse($path) as $order => $id) {
-                switch ($order) {
-                    case 0:
-                        $distance = 'current';
-                        break;
-
-                    case 1:
-                        $distance = 'parent';
-                        break;
-
-                    default:
-                        $distance = 'ancestor';
-                        break;
-                }
-                $this->tree->setLeafProp($id, 3, $distance);
-                unset($distance);
-            }
-        }
-    }
-
     public function getLeafByTarget(string $target, bool $strict = true)
     {
         $leaves = [];
@@ -218,39 +163,96 @@ class Climber extends API\ClimberAPI
         return $leaves;
     }
 
+    public function activate(int $hint)
+    {
+        if ($leaf = $this->tree->getLeaf($hint)) {
+            $path = $this->tree->getLeafPath($hint);
+            $path[] = $hint;
+            foreach (array_reverse($path) as $order => $id) {
+                switch ($order) {
+                    case 0:
+                        $distance = 'current';
+                        break;
+
+                    case 1:
+                        $distance = 'parent';
+                        break;
+
+                    default:
+                        $distance = 'ancestor';
+                        break;
+                }
+                $this->tree->setLeafProp($id, 3, $distance);
+                unset($distance);
+            }
+        }
+    }
+    
+    public function hook(string $location, $callback, $order = false)
+    {
+        $propName = sprintf("%sHooks", $location);
+        if (property_exists($this, $propName)) {
+            if ($order === false) {
+                return $this->{$propName}[] = $callback;
+            } else {
+                return $this->{$propName}[(int) $order] = $callback;
+            }
+        }
+
+        return null;
+    }
+
+    public function __toString()
+    {
+        return $this->element();
+    }
+
+    public function element($echo = false)
+    {
+        if (null != $this->tree->grow()) {
+            $topData = $this->runHook('top', [
+                'class' => $this->topClass,
+                'attrs' => $this->attrs($this->topAttr),
+                'tree' => $this->tree,
+                'echo' => $echo,
+            ]);
+
+            $menu = sprintf(
+                '<nav class="%1$s"%2$s>%3$s</nav>',
+                $topData['class'],
+                $topData['attrs'],
+                $this->branch($this->harvest($topData['tree']))
+            );
+
+            if ($topData['echo']) {
+                echo $menu;
+            } else {
+                return $menu;
+            }
+        }
+
+        return null;
+    }
+
     /**
-     * Safely return a value for $property with $value
-     * appended to the end of the array.
+     * Run all hooks attached to a particular location.
      *
-     * @param mixed $value
-     * @param string $property
-     * @return array
+     * $data can be any type of data, but will usually be an array.
+     *
+     * @param string $location
+     * @param mixed $data
+     * @return mixed
      */
-    protected function appendArrayProp($value, string $property)
+    protected function runHook(string $location, $data)
     {
-        $temp = $this->$property;
-        array_push($temp, $value);
-        return $temp;
-    }
+        $propName = sprintf("%sHooks", $location);
+        if (property_exists($this, $propName) && count($this->{$propName}) > 0) {
+            foreach ($this->{$propName} as $callback) {
+                $data = call_user_func($callback, $data);
+            }
+        }
 
-    public function setTopAttr($value, $property)
-    {
-        return $this->appendArrayProp($value, $property);
-    }
-
-    public function setMenuAttr($value, $property)
-    {
-        return $this->appendArrayProp($value, $property);
-    }
-
-    public function setItemAttr($value, $property)
-    {
-        return $this->appendArrayProp($value, $property);
-    }
-
-    public function setLinkAttr($value, $property)
-    {
-        return $this->appendArrayProp($value, $property);
+        return $data;
     }
 
   /**
@@ -347,102 +349,6 @@ class Climber extends API\ClimberAPI
         return null;
     }
 
-    public function hook(string $location, $callback, $order = false)
-    {
-        $propName = sprintf("%sHooks", $location);
-        if (property_exists($this, $propName)) {
-            if ($order === false) {
-                return $this->{$propName}[] = $callback;
-            } else {
-                return $this->{$propName}[(int) $order] = $callback;
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Run all hooks attached to a particular location.
-     *
-     * $data can be any type of data, but will usually be an array.
-     *
-     * @param string $location
-     * @param mixed $data
-     * @return mixed
-     */
-    protected function runHook(string $location, $data)
-    {
-        $propName = sprintf("%sHooks", $location);
-        if (property_exists($this, $propName) && count($this->{$propName}) > 0) {
-            foreach ($this->{$propName} as $callback) {
-                $data = call_user_func($callback, $data);
-            }
-        }
-
-        return $data;
-    }
-
-    /**
-     * This takes a numeric id for a leaf, and expands it out. It will create
-     * an `<li>` wrapper, and organize the link and optional submenu inside
-     * of it.
-     *
-     * @param integer $hint
-     * @return string
-     */
-    protected function bud(int $hint)
-    {
-        $bud = $this->tree->getLeaf($hint);
-
-        $itemData = $this->runHook('item', [
-            'class' => $this->itemClass,
-            'attrs' => $this->attrs($this->itemAttr),
-            'bud' => $bud,
-        ]);
-
-        $itemOutput = $this->runHook('itemOutput', [
-            'format' => '%1$s%2$s',
-            'args' => [
-                $this->fruit($bud),
-                $this->branch($bud),
-            ],
-        ]);
-
-        return vsprintf(
-            sprintf(
-                '<li class="%1$s"%2$s>%3$s</li>',
-                $itemData['class'],
-                $itemData['attrs'],
-                $itemOutput['format']
-            ),
-            $itemOutput['args']
-        );
-    }
-
-  /**
-   * Sprout a link.
-   *
-   * @param array $bud
-   * @return string
-   */
-    protected function fruit(array $bud)
-    {
-        $linkData = $this->runHook('link', [
-            'link' => Z\Arrays::pluck($bud, [2, 'target']),
-            'class' => $this->linkClass,
-            'attrs' => $this->attrs($this->linkAttr),
-            'content' => Z\Arrays::pluck($bud, [2, 'name']),
-        ]);
-
-        return sprintf(
-            '<a href="%1$s" class="%2$s"%3$s>%4$s</a>',
-            $linkData['link'],
-            $linkData['class'],
-            $linkData['attrs'],
-            $linkData['content']
-        );
-    }
-
     /**
      * Branch out a submenu.
      *
@@ -511,30 +417,124 @@ class Climber extends API\ClimberAPI
         ];
     }
 
-    public function element($echo = false)
+    public function __get(string $property)
     {
-        if (null != $this->tree->grow()) {
-            $topData = $this->runHook('top', [
-                'class' => $this->topClass,
-                'attrs' => $this->attrs($this->topAttr),
-                'tree' => $this->tree,
-                'echo' => $echo,
-            ]);
-
-            $menu = sprintf(
-                '<nav class="%1$s"%2$s>%3$s</nav>',
-                $topData['class'],
-                $topData['attrs'],
-                $this->branch($this->harvest($topData['tree']))
-            );
-
-            if ($topData['echo']) {
-                echo $menu;
-            } else {
-                return $menu;
-            }
+        if (property_exists($this, $property)) {
+            return $this->$property;
         }
 
         return null;
+    }
+
+    public function __set(string $property, $value = null)
+    {
+        if (in_array($property, $this->setable)) {
+            $setMethod = sprintf("set%s", ucfirst($property));
+            if (method_exists($this, $setMethod)) {
+                $value = call_user_func([$this, $setMethod], $value, $property);
+            }
+
+            $this->$property = $value;
+
+            return $this->$property;
+        }
+
+        return null;
+    }
+
+    public function setTopAttr($value, $property)
+    {
+        return $this->appendArrayProp($value, $property);
+    }
+
+    /**
+     * Safely return a value for $property with $value
+     * appended to the end of the array.
+     *
+     * @param mixed $value
+     * @param string $property
+     * @return array
+     */
+    protected function appendArrayProp($value, string $property)
+    {
+        $temp = $this->$property;
+        array_push($temp, $value);
+        return $temp;
+    }
+
+    public function setMenuAttr($value, $property)
+    {
+        return $this->appendArrayProp($value, $property);
+    }
+
+    public function setItemAttr($value, $property)
+    {
+        return $this->appendArrayProp($value, $property);
+    }
+
+    public function setLinkAttr($value, $property)
+    {
+        return $this->appendArrayProp($value, $property);
+    }
+
+    /**
+     * This takes a numeric id for a leaf, and expands it out. It will create
+     * an `<li>` wrapper, and organize the link and optional submenu inside
+     * of it.
+     *
+     * @param integer $hint
+     * @return string
+     */
+    protected function bud(int $hint)
+    {
+        $bud = $this->tree->getLeaf($hint);
+
+        $itemData = $this->runHook('item', [
+            'class' => $this->itemClass,
+            'attrs' => $this->attrs($this->itemAttr),
+            'bud' => $bud,
+        ]);
+
+        $itemOutput = $this->runHook('itemOutput', [
+            'format' => '%1$s%2$s',
+            'args' => [
+                $this->fruit($bud),
+                $this->branch($bud),
+            ],
+        ]);
+
+        return vsprintf(
+            sprintf(
+                '<li class="%1$s"%2$s>%3$s</li>',
+                $itemData['class'],
+                $itemData['attrs'],
+                $itemOutput['format']
+            ),
+            $itemOutput['args']
+        );
+    }
+
+  /**
+   * Sprout a link.
+   *
+   * @param array $bud
+   * @return string
+   */
+    protected function fruit(array $bud)
+    {
+        $linkData = $this->runHook('link', [
+            'link' => Z\Arrays::pluck($bud, [2, 'target']),
+            'class' => $this->linkClass,
+            'attrs' => $this->attrs($this->linkAttr),
+            'content' => Z\Arrays::pluck($bud, [2, 'name']),
+        ]);
+
+        return sprintf(
+            '<a href="%1$s" class="%2$s"%3$s>%4$s</a>',
+            $linkData['link'],
+            $linkData['class'],
+            $linkData['attrs'],
+            $linkData['content']
+        );
     }
 }

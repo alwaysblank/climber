@@ -12,7 +12,7 @@ class WordPress extends Spotter
         'title' => 'name',
     ];
 
-    protected function plant()
+    protected function soil()
     {
         $temp = [];
         foreach ($this->seed as $item) {

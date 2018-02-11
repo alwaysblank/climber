@@ -9,7 +9,7 @@ use Livy\Climber\Tree;
  * in future versions of the software.
  * @package Livy\Climber\API
  */
-abstract class ClimberAPI
+interface ClimberAPI
 {
     /**
      * Sets up the `$tree`, and adds active classes to the appropriate leaves,
@@ -18,14 +18,14 @@ abstract class ClimberAPI
      * @param Tree $tree
      * @param string $currentUrl
      */
-    abstract public function __construct(Tree $tree, $currentUrl = null);
+    public function __construct(Tree $tree, $currentUrl = null);
 
     /**
      * If `Climber` is treated as a string, print out a <ul></ul>.
      *
      * @return string
      */
-    abstract public function __toString();
+    public function __toString();
 
     /**
      * Get the value of a property.
@@ -36,7 +36,7 @@ abstract class ClimberAPI
      * @param string $property  Name of property to get.
      * @return mixed            Returns bool `false` if property does not exist.
      */
-    abstract public function __get(string $property);
+    public function __get(string $property);
 
     /**
      * Set a property, if that is possible.
@@ -53,7 +53,7 @@ abstract class ClimberAPI
      * @param mixed $value          Value we want to set $property to.
      * @return mixed                $value if $this->$property is setable, bool `false` otherwise.
      */
-    abstract public function __set(string $property, $value = null);
+    public function __set(string $property, $value = null);
 
     /**
      * Activate a leaf.
@@ -65,7 +65,7 @@ abstract class ClimberAPI
      * @param integer $hint
      * @return void
      */
-    abstract public function activate(int $hint);
+    public function activate(int $hint);
 
     /**
      * Gets zero or more leaves, based on their target.
@@ -82,7 +82,7 @@ abstract class ClimberAPI
      * @param boolean $strict
      * @return array
      */
-    abstract public function getLeafByTarget(string $target, bool $strict = true);
+    public function getLeafByTarget(string $target, bool $strict = true);
 
     /**
      * Set $this->topAttr.
@@ -93,7 +93,7 @@ abstract class ClimberAPI
      * @param $property
      * @return array
      */
-    abstract public function setTopAttr($value, $property);
+    public function setTopAttr($value, $property);
 
     /**
      * Set $this->menuAttr.
@@ -104,7 +104,7 @@ abstract class ClimberAPI
      * @param $property
      * @return array
      */
-    abstract public function setMenuAttr($value, $property);
+    public function setMenuAttr($value, $property);
 
     /**
      * Set $this->itemAttr.
@@ -115,7 +115,7 @@ abstract class ClimberAPI
      * @param $property
      * @return array
      */
-    abstract public function setItemAttr($value, $property);
+    public function setItemAttr($value, $property);
 
     /**
      * Set $this->linkAttr.
@@ -126,7 +126,7 @@ abstract class ClimberAPI
      * @param $property
      * @return array
      */
-    abstract public function setLinkAttr($value, $property);
+    public function setLinkAttr($value, $property);
 
     /**
      * Hook up a callback to a processing step.
@@ -140,7 +140,7 @@ abstract class ClimberAPI
      * @param int|boolean $order
      * @return void
      */
-    abstract public function hook(string $location, $callback, $order = false);
+    public function hook(string $location, $callback, $order = false);
 
     /**
      * Return (or optionally echo) the full HTML for the menu.
@@ -148,5 +148,5 @@ abstract class ClimberAPI
      * @param boolean $echo
      * @return string
      */
-    abstract public function element($echo = false);
+    public function element($echo = false);
 }

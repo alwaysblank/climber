@@ -2,7 +2,7 @@
 
 namespace Livy\Climber;
 
-use Spotter\Spotter;
+use Livy\Climber\Spotter\Spotter;
 use \Zenodorus as Z;
 
 /**
@@ -23,7 +23,6 @@ use \Zenodorus as Z;
  *          [...],      // Other data about this menu item. This data
  *                      // is likely relevant to Climber, but isn't
  *                      // important to Tree.
-
  *          'parent',   // This is the "active" key, which contains a
  *                      // value when leaf is active, or the parent/
  *                      // ancestor of an active leaf. "Active" state
@@ -57,7 +56,7 @@ use \Zenodorus as Z;
  * @param Spotter/[ClassName] $spotter      An instance of a class that
  *                                          extends Spotter/Spotter.
  */
-class Tree
+class Tree implements API\TreeAPI
 {
     /**
      * Normalized data returned from Spotter.
@@ -73,7 +72,7 @@ class Tree
      * @var array
      */
     protected $tree;
-    
+
     /**
      * Legend for array keys.
      *
@@ -99,62 +98,25 @@ class Tree
      */
     protected $clone = false;
 
-    /**
-     * When a Tree is created, this processes the input from a Spotter to
-     * generated a prepped, trustable $tree.
-     *
-     * @param [type] $spotter
-     */
     public function __construct($spotter)
     {
         $this->nursery($spotter);
     }
 
-    /**
-     * We want to know if we're the original or not, so set `$clone`.
-     *
-     * @return void
-     */
-    protected function __clone()
+    public function nursery($spotter)
     {
-        $this->clone = true;
-    }
-
-    /**
-     * Get an appropriate query for string/integer slot requests.
-     *
-     * This allows us to easily use aliases for numeric slot keys, and easily
-     * expand that list through `$map` if necessary.
-     *
-     * @param string|integer $slot
-     * @return integer|boolean  Returns an integer if viable, boolean `false`
-     *                          otherwise.
-     */
-    protected function query($slot)
-    {
-        if (is_int($slot)) {
-            return $slot;
-        } elseif (isset($this->map[$slot])) {
-            return (int) $this->map[$slot];
+        try {
+            if (is_subclass_of($spotter, __NAMESPACE__ . '\\Spotter\\Spotter')) {
+                $this->germinated = $spotter->germinate();
+            } else {
+                throw new \Exception("You have to give me a Spotter.", 1);
+            }
+        } catch (\Exception $exception) {
+            $exception->getMessage();
+            return false;
         }
 
-        return false;
-    }
-
-    /**
-     * Get a workspace.
-     *
-     * This clones the Tree if called from the original; otherwise it returns
-     * the current Tree. This is so that we can isolate changes until we're
-     * sure they're successful—but also prevent our scripts from generating
-     * hundreds of recursive clones and eating up memory.
-     *
-     * @return Tree
-     */
-    protected function workspace()
-    {
-        // Only clone if we're not a clone; too many clones is bad.
-        return $this->clone ? $this : clone $this;
+        $this->tree = $this->plant();
     }
 
     /**
@@ -162,7 +124,7 @@ class Tree
      *
      * This expects normalized data from a Spotter.
      *
-     * @return void
+     * @return array|null
      */
     protected function plant()
     {
@@ -205,69 +167,26 @@ class Tree
         return null;
     }
 
-    /**
-     * Plants the tree.
-     *
-     * This is used to make sure the data we're going to use came from an actual
-     * Spotter, and to complain if it didn't.
-     *
-     * It's a public function so that we can pass a new Spotter and generate
-     * a new tree after this Tree has been instantiated. That's not really
-     * recommended, though.
-     *
-     * @param object $spotter   An object in a class that extends
-     *                          Spotter\Spotter.
-     * @return void
-     */
-    public function nursery($spotter)
+    public function getLeafPath(int $id, array $ancestors = [])
     {
-        if (is_subclass_of($spotter, __NAMESPACE__.'\\Spotter\\Spotter')) {
-            $this->germinated = $spotter->germinate();
-        } else {
-            throw new \Exception("You have to give me a Spotter.", 1);
+        if (null === $this->getLeaf($id)
+            || null === $this->getLeafContent($id, 0)) {
+            // This item doesn't exist or has no ancestors.
+            // Either we've reached the last step in our path, we were passed
+            // a bad leaf, or this leaf has no parent.
+            return array_reverse($ancestors);
         }
 
-        $this->tree = $this->plant();
+        array_push($ancestors, $this->getLeafContent($id, 0));
+
+        return $this->getLeafPath($this->getLeafContent($id, 0), $ancestors);
     }
 
-    /**
-     * Publically return the tree, as it exists.
-     *
-     * In many ways, the core function of this class.
-     *
-     * @return array
-     */
-    public function grow()
-    {
-        return $this->tree;
-    }
-
-    /**
-     * Get a leaf by its id.
-     *
-     * @param integer $id
-     * @return array|null
-     */
     public function getLeaf(int $id)
     {
         return isset($this->tree[$id]) ? $this->tree[$id] : null;
     }
 
-    /**
-     * Get data from within a leaf.
-     *
-     * The point of this is to avoid having to do ugly stuff like
-     * `$this->getLeaf(2)[1]['order']`.
-     *
-     * Pass $data to get something from the 2 slot (data) on a leaf. Method will
-     * return `null` if you pass a value to data other than `null` when
-     * accessing any slot other than 2.
-     *
-     * @param integer $id
-     * @param int|string $slot
-     * @param int|string $data
-     * @return mixed
-     */
     public function getLeafContent(int $id, $slot, $data = null)
     {
         $query = $this->query($slot);
@@ -287,35 +206,27 @@ class Tree
         return null;
     }
 
-  /**
-   * Find the ancestors of a particular leaf.
-   *
-   * @param integer $id
-   * @param array $ancestors
-   * @return array
-   */
-    public function getLeafPath(int $id, array $ancestors = [])
+    /**
+     * Get an appropriate query for string/integer slot requests.
+     *
+     * This allows us to easily use aliases for numeric slot keys, and easily
+     * expand that list through `$map` if necessary.
+     *
+     * @param string|integer $slot
+     * @return integer|boolean  Returns an integer if viable, boolean `false`
+     *                          otherwise.
+     */
+    protected function query($slot)
     {
-        if (null === $this->getLeaf($id)
-            || null === $this->getLeafContent($id, 0)) {
-            // This item doesn't exist or has no ancestors.
-            // Either we've reached the last step in our path, we were passed
-            // a bad leaf, or this leaf has no parent.
-            return array_reverse($ancestors);
+        if (is_int($slot)) {
+            return $slot;
+        } elseif (isset($this->map[$slot])) {
+            return (int)$this->map[$slot];
         }
 
-        array_push($ancestors, $this->getLeafContent($id, 0));
-
-        return $this->getLeafPath($this->getLeafContent($id, 0), $ancestors);
+        return false;
     }
 
-  /**
-   * Find the siblings of a particular leaf.
-   *
-   * @param integer $id
-   * @param boolean $exclude   If true, exclude queried leaf from return.
-   * @return array
-   */
     public function getLeafSiblings(int $id, bool $exclude = null)
     {
         $parent = $this->getLeafContent($id, 'parent');
@@ -331,35 +242,47 @@ class Tree
         return $siblings;
     }
 
-    /**
-     * Forceably sets a leaf property.
-     *
-     * **Probably Don't Use This Directly!**
-     *
-     * If you need to set a prop, try using one of these instead:
-     * - `setLeafProp()`
-     * - `setParent()`
-     * - `setChildren()`
-     * - `setData()`
-     *
-     * This method should only ever be called by other methods that really know
-     * what they're doing: It makes no checks beyond making sure that the leaf
-     * actually exists. You can easily break or overwrite things you shouldn't
-     * by calling this directly.
-     *
-     * @param integer $id
-     * @param integer|string $slot
-     * @param mixed $value
-     * @return array|boolean    Returns the changed leaf if successful, boolean
-     *                          `false` otherwise.
-     */
-    protected function dangerouslySetLeafProp(int $id, $slot, $value)
+    public function setLeaf(int $id, array...$actions)
     {
-        if ($this->getLeaf($id)) {
-            $query = $this->query($slot);
+        if ($this->getLeaf($id) && count($actions) > 0) {
+            $workspace = $this->workspace();
 
-            if (false !== $query) {
-                $this->tree[$id][$query] = $value;
+            $success = array_reduce(
+                $actions,
+                function ($carry, $current) use ($id, $workspace) {
+                    // If $carry is false, we've already failed.
+                    if ($carry === false) {
+                        return false;
+                    }
+
+                    // If these aren't set, we can't proceed.
+                    if (!isset($current[0]) || !isset($current[1])) {
+                        return false;
+                    }
+
+                    // setLeafProp() will handle different prop types for us.
+                    $result = $workspace->setLeafProp(
+                        $id,
+                        $current[0],
+                        $current[1]
+                    );
+
+                    if ($result && $carry === null) {
+                        // The first iteration, so set as `true` if it is.
+                        return true;
+                    } elseif ($result === false) {
+                        // Otherwise, only change if `false`.
+                        return false;
+                    } else {
+                        return $carry;
+                    }
+                },
+                null
+            );
+
+            if ($success) {
+                $this->tree = $workspace->grow();
+                unset($workspace);
                 return $this->getLeaf($id);
             }
         }
@@ -368,24 +291,21 @@ class Tree
     }
 
     /**
-     * Set a leaf prop, safely.
+     * Get a workspace.
      *
-     * This method will determine which slot you are targeting and act
-     * accordingly. For the actual behavior of setting various slots, see
-     * the methods that deal with them.
+     * This clones the Tree if called from the original; otherwise it returns
+     * the current Tree. This is so that we can isolate changes until we're
+     * sure they're successful—but also prevent our scripts from generating
+     * hundreds of recursive clones and eating up memory.
      *
-     * @see Tree::setParent()           Set a parent.
-     * @see Tree::setChildren()         Set children.
-     * @see Tree::setData()             Set data.
-     * @see Tree::setActive()           Set active state.
-     *
-     *
-     * @param integer $id
-     * @param integer|string $slot
-     * @param mixed $value
-     * @return mixed|boolean    Returns the value set if successful, `false` if
-     *                          not.
+     * @return Tree
      */
+    protected function workspace()
+    {
+        // Only clone if we're not a clone; too many clones is bad.
+        return $this->clone ? $this : clone $this;
+    }
+
     public function setLeafProp(int $id, $slot, $value)
     {
         if ($this->getLeaf($id)) {
@@ -410,39 +330,6 @@ class Tree
                         return false;
                         break;
                 }
-                return $this->tree[$id];
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Set some data in the 2 (data) slot on a leaf.
-     *
-     * Prevents user from setting the `id` value of a leaf, because ids should
-     * be immutable.
-     *
-     * @param integer $id
-     * @param integer|string $key
-     * @param mixed $value
-     * @return mixed|boolean    Returns the value set if successful, `false` if
-     *                          not.
-     */
-    protected function setData(int $id, array $action)
-    {
-
-        if (isset($action[0])
-            && isset($action[1])
-            && (is_int($action[0]) || is_string($action[0]))) {
-            if ($action[0] == 'id') {
-                // Don't change the id.
-                return false;
-            }
-
-            if ($data = $this->getLeafContent($id, 2)) {
-                $data[$action[0]] = $action[1];
-                return $this->dangerouslySetLeafProp($id, 2, $data);
             }
         }
 
@@ -483,78 +370,39 @@ class Tree
     }
 
     /**
-     * Set leaf children.
+     * Forceably sets a leaf property.
      *
-     * By default, this will also modify all leaves that are affected by this
-     * change (namely, new and removed children of `$id`). To disable this
-     * behavior, set `$cascade` to `false`.
+     * **Probably Don't Use This Directly!**
      *
-     * **WARNING!!**
-     * Setting `$cascade` to `false` may create undesirable behavior, as
-     * relationships between leaves will no longer be internally consistent.
+     * If you need to set a prop, try using one of these instead:
+     * - `setLeafProp()`
+     * - `setParent()`
+     * - `setChildren()`
+     * - `setData()`
      *
-     * This is essentially a wrapper for `changeParent()` with some additional
-     * logic. You should probably call this instead of `changeParent()`.
-     *
-     * @see Tree::changeParent()
+     * This method should only ever be called by other methods that really know
+     * what they're doing: It makes no checks beyond making sure that the leaf
+     * actually exists. You can easily break or overwrite things you shouldn't
+     * by calling this directly.
      *
      * @param integer $id
-     * @param array $children
-     * @param boolean $cascade
-     * @return void
+     * @param integer|string $slot
+     * @param mixed $value
+     * @return array|boolean    Returns the changed leaf if successful, boolean
+     *                          `false` otherwise.
      */
-    protected function setChildren(int $id, array $children, $cascade = true)
+    protected function dangerouslySetLeafProp(int $id, $slot, $value)
     {
-        if (!$cascade) {
-            return $this->dangerouslySetLeafProp($id, 1, $children);
-        } elseif ($cascade) {
-            $workspace = $this->workspace();
-            $setChildren = array_reduce(
-                $children,
-                function ($carry, $current) use ($id, $workspace) {
-                    // If $carry is false, we've already failed.
-                    if ($carry === false) {
-                        return false;
-                    }
+        if ($this->getLeaf($id)) {
+            $query = $this->query($slot);
 
-                    $result = $workspace->changeParent($current, $id);
-
-                    if ($result && $carry === null) {
-                        // Set `true` if first iteration and succeeded.
-                        return true;
-                    } elseif ($result === false) {
-                        return false;
-                    } else {
-                        return $carry;
-                    }
-                },
-                null
-            );
-
-            if ($setChildren) {
-                $this->tree = $workspace->grow();
-                unset($workspace);
+            if (false !== $query) {
+                $this->tree[$id][$query] = $value;
                 return $this->getLeaf($id);
             }
         }
 
         return false;
-    }
-
-    /**
-     * Set the active slot on a leaf.
-     *
-     * @param integer $id
-     * @param string $value
-     * @return void
-     */
-    protected function setActive(int $id, string $value)
-    {
-        return $this->dangerouslySetLeafProp(
-            $id,
-            3,
-            $value
-        );
     }
 
     /**
@@ -641,7 +489,7 @@ class Tree
         if ($removedRecursiveChild
             && $removedFromOldParent
             && $setNewParent
-            && $setNewChild ) {
+            && $setNewChild) {
             $this->tree = $workspace->grow();
             unset($workspace);
             return $this->getLeaf($child);
@@ -650,64 +498,52 @@ class Tree
         return false;
     }
 
+    public function grow()
+    {
+        return $this->tree;
+    }
+
     /**
-     * Set many values on a leaf.
+     * Set leaf children.
      *
-     * Pass as many arrays as you like to the method; it will apply them all in
-     * order. The template for an array is:
-     * [<slot>, <value>]             // top-level slots
-     * [<slot>, [<key>, <value>]]      // values for slot 2 (data)
-     * So if you wanted to change the target to `google.com` and the parent to
-     * `2`, that call would look like this:
-     * ```
-     *  $Tree->setLeaf(
-     *      55,
-     *      [0, 2],
-     *      ['data', ['target', 'https://google.com']]
-     *  );
-     * ```
-     * The method will return the changed leaf if it is successful. If it
-     * encounters any problems, it will instead return `false`. If any of the
-     * `$actions` fail, all actions are considered to have failed.
+     * By default, this will also modify all leaves that are affected by this
+     * change (namely, new and removed children of `$id`). To disable this
+     * behavior, set `$cascade` to `false`.
      *
-     * This method operates on a clone of the current Tree, so changes are only
-     * applied if all actions are successful.
+     * **WARNING!!**
+     * Setting `$cascade` to `false` may create undesirable behavior, as
+     * relationships between leaves will no longer be internally consistent.
+     *
+     * This is essentially a wrapper for `changeParent()` with some additional
+     * logic. You should probably call this instead of `changeParent()`.
+     *
+     * @see Tree::changeParent()
      *
      * @param integer $id
-     * @param array ...$actions  One or more arrays.
-     * @return array|boolean     Returns the new leaf if successful, `false` if
-     *                           not.
+     * @param array $children
+     * @param boolean $cascade
+     * @return array|bool
      */
-    public function setLeaf(int $id, array...$actions)
+    protected function setChildren(int $id, array $children, $cascade = true)
     {
-        if ($this->getLeaf($id) && count($actions) > 0) {
+        if (!$cascade) {
+            return $this->dangerouslySetLeafProp($id, 1, $children);
+        } elseif ($cascade) {
             $workspace = $this->workspace();
-
-            $success = array_reduce(
-                $actions,
+            $setChildren = array_reduce(
+                $children,
                 function ($carry, $current) use ($id, $workspace) {
                     // If $carry is false, we've already failed.
                     if ($carry === false) {
                         return false;
                     }
 
-                    // If these aren't set, we can't proceed.
-                    if (!isset($current[0]) || !isset($current[1])) {
-                        return false;
-                    }
-
-                    // setLeafProp() will handle different prop types for us.
-                    $result = $workspace->setLeafProp(
-                        $id,
-                        $current[0],
-                        $current[1]
-                    );
+                    $result = $workspace->changeParent($current, $id);
 
                     if ($result && $carry === null) {
-                        // The first iteration, so set as `true` if it is.
+                        // Set `true` if first iteration and succeeded.
                         return true;
                     } elseif ($result === false) {
-                        // Otherwise, only change if `false`.
                         return false;
                     } else {
                         return $carry;
@@ -716,7 +552,7 @@ class Tree
                 null
             );
 
-            if ($success) {
+            if ($setChildren) {
                 $this->tree = $workspace->grow();
                 unset($workspace);
                 return $this->getLeaf($id);
@@ -724,5 +560,62 @@ class Tree
         }
 
         return false;
+    }
+
+    /**
+     * Set some data in the 2 (data) slot on a leaf.
+     *
+     * Prevents user from setting the `id` value of a leaf, because ids should
+     * be immutable.
+     *
+     * @param integer $id
+     * @param array $action
+     * @return mixed|boolean    Returns the value set if successful, `false` if
+     *                          not.
+     */
+    protected function setData(int $id, array $action)
+    {
+
+        if (isset($action[0])
+            && isset($action[1])
+            && (is_int($action[0]) || is_string($action[0]))) {
+            if ($action[0] == 'id') {
+                // Don't change the id.
+                return false;
+            }
+
+            if ($data = $this->getLeafContent($id, 2)) {
+                $data[$action[0]] = $action[1];
+                return $this->dangerouslySetLeafProp($id, 2, $data);
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Set the active slot on a leaf.
+     *
+     * @param integer $id
+     * @param string $value
+     * @return array|bool
+     */
+    protected function setActive(int $id, string $value)
+    {
+        return $this->dangerouslySetLeafProp(
+            $id,
+            3,
+            $value
+        );
+    }
+
+    /**
+     * We want to know if we're the original or not, so set `$clone`.
+     *
+     * @return void
+     */
+    protected function __clone()
+    {
+        $this->clone = true;
     }
 }
