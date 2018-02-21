@@ -12,6 +12,9 @@ class WordPress extends Spotter
         'title' => 'name',
     ];
 
+    /**
+     * @return array
+     */
     protected function soil()
     {
         $temp = [];

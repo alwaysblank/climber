@@ -2,7 +2,9 @@
 
 namespace Livy\Climber\Spotter;
 
-abstract class Spotter
+use Livy\Climber\API\SpotterAPI;
+
+abstract class Spotter implements SpotterAPI
 {
     protected $seed;
     protected $sprout;
