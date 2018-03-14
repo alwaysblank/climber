@@ -2,6 +2,7 @@
 
 namespace Livy\Climber;
 
+use Livy\Climber\Spotter\Forester;
 use Livy\Climber\Spotter\Spotter;
 use \Zenodorus as Z;
 
@@ -82,10 +83,10 @@ class Tree implements API\TreeAPI
      * @var array
      */
     protected $map = [
-        'parent' => 0,
+        'parent'   => 0,
         'children' => 1,
-        'data' => 2,
-        'active' => 3,
+        'data'     => 2,
+        'active'   => 3,
     ];
 
     /**
@@ -116,7 +117,7 @@ class Tree implements API\TreeAPI
             return false;
         }
 
-        $this->tree = $this->plant();
+        return $this->tree = $this->plant();
     }
 
     /**
@@ -129,7 +130,7 @@ class Tree implements API\TreeAPI
     protected function plant()
     {
         if (is_array($this->germinated)) {
-            $temp = $this->germinated;
+            $temp    = $this->germinated;
             $planted = [];
             foreach ($temp as $id => $data) {
                 // Set the parent for this child
@@ -182,6 +183,16 @@ class Tree implements API\TreeAPI
         return $this->getLeafPath($this->getLeafContent($id, 0), $ancestors);
     }
 
+    public function isLeafChildOf(int $leaf, int $parent)
+    {
+        $ancestors = $this->getLeafPath($leaf);
+        if (count($ancestors) > 0 && in_array($parent, $ancestors)) {
+            return true;
+        }
+
+        return false;
+    }
+
     public function getLeaf(int $id)
     {
         return isset($this->tree[$id]) ? $this->tree[$id] : null;
@@ -229,8 +240,8 @@ class Tree implements API\TreeAPI
 
     public function getLeafSiblings(int $id, bool $exclude = null)
     {
-        $parent = $this->getLeafContent($id, 'parent');
-        $tree = $this->tree;
+        $parent   = $this->getLeafContent($id, 'parent');
+        $tree     = $this->tree;
         $siblings = array_filter($tree, function ($item) use ($parent) {
             return $item[0] == $parent;
         });
@@ -385,9 +396,9 @@ class Tree implements API\TreeAPI
      * actually exists. You can easily break or overwrite things you shouldn't
      * by calling this directly.
      *
-     * @param integer $id
+     * @param integer        $id
      * @param integer|string $slot
-     * @param mixed $value
+     * @param mixed          $value
      * @return array|boolean    Returns the changed leaf if successful, boolean
      *                          `false` otherwise.
      */
@@ -430,9 +441,9 @@ class Tree implements API\TreeAPI
     {
         $workspace = $this->workspace();
 
-        $childLeaf = $workspace->getLeaf($child);
+        $childLeaf     = $workspace->getLeaf($child);
         $newParentLeaf = $workspace->getLeaf($newParent);
-        $oldParent = $childLeaf[0];
+        $oldParent     = $childLeaf[0];
 
         /**
          * If $newParent is a child of $child, we don't want to create
@@ -520,7 +531,7 @@ class Tree implements API\TreeAPI
      * @see Tree::changeParent()
      *
      * @param integer $id
-     * @param array $children
+     * @param array   $children
      * @param boolean $cascade
      * @return array|bool
      */
@@ -529,7 +540,7 @@ class Tree implements API\TreeAPI
         if (!$cascade) {
             return $this->dangerouslySetLeafProp($id, 1, $children);
         } elseif ($cascade) {
-            $workspace = $this->workspace();
+            $workspace   = $this->workspace();
             $setChildren = array_reduce(
                 $children,
                 function ($carry, $current) use ($id, $workspace) {
@@ -569,7 +580,7 @@ class Tree implements API\TreeAPI
      * be immutable.
      *
      * @param integer $id
-     * @param array $action
+     * @param array   $action
      * @return mixed|boolean    Returns the value set if successful, `false` if
      *                          not.
      */
@@ -597,7 +608,7 @@ class Tree implements API\TreeAPI
      * Set the active slot on a leaf.
      *
      * @param integer $id
-     * @param string $value
+     * @param string  $value
      * @return array|bool
      */
     protected function setActive(int $id, string $value)
@@ -617,5 +628,55 @@ class Tree implements API\TreeAPI
     protected function __clone()
     {
         $this->clone = true;
+    }
+
+    /**
+     * Takes a leaf and returns a new Tree composed of only the children of that leaf.
+     *
+     * To include the root in the returned Tree, pass `true` to the second parameter.
+     *
+     * @param int  $root
+     * @param bool $includeRoot
+     * @return Tree
+     */
+    public function subtree(int $root, bool $includeRoot = false)
+    {
+        $subtree  = clone $this;
+        $children = [];
+        foreach ($subtree->grow() as $id => $leaf) {
+            if (true === $includeRoot && $root === $id) {
+                $leaf[0]       = null;
+                $children[$id] = $leaf;
+            } elseif ($this->isLeafChildOf($id, $root)) {
+                if ($root === $leaf[0] && false === $includeRoot) {
+                    $leaf[0] = null;
+                }
+                $children[$id] = $leaf;
+            }
+        }
+
+        return new Tree(
+            new Forester($children)
+        );
+    }
+
+    /**
+     * Sometimes we don't want to be a clone after all.
+     */
+    public function declone()
+    {
+        $this->clone = false;
+    }
+
+    /**
+     * Remove a leaf from the tree.
+     *
+     * @param int $id
+     * @return bool
+     */
+    protected function pluck(int $id)
+    {
+        unset($this->tree[$id]);
+        return isset($this->tree[$id]);
     }
 }

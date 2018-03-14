@@ -163,7 +163,16 @@ class ClimberTest extends TestCase
         $this->assertEquals(
             \Storage::$ActivatedMenuStringExpected,
             $activateElementTest->element(),
-            'Menus were not properly acivated.'
+            'Menus were not properly activated.'
         );
     }
+
+//    public function testSubTree()
+//    {
+//        $fullTree = new Climber(
+//            $this->tree,
+//            'https://oregon.gov/corvallis/osu'
+//        );
+//        $subTree = $fullTree->sub()
+//    }
 }

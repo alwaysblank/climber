@@ -30,7 +30,7 @@ interface TreeAPI
      *
      * @param object $spotter An object in a class that extends
      *                          Spotter\Spotter.
-     * @return void
+     * @return array
      * @throws \Exception
      */
     public function nursery($spotter);
@@ -77,6 +77,15 @@ interface TreeAPI
      * @return array
      */
     public function getLeafPath(int $id, array $ancestors = []);
+
+    /**
+     * Is $leaf a child of $parent?
+     *
+     * @param int $leaf
+     * @param int $parent
+     * @return boolean
+     */
+    public function isLeafChildOf(int $leaf, int $parent);
 
     /**
      * Find the siblings of a particular leaf.

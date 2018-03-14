@@ -7,6 +7,9 @@ use \PHPUnit\Framework\TestCase;
 
 class TreeTest extends TestCase
 {
+    /** @var Tree */
+    protected $test;
+
     protected function setUp()
     {
         $this->test = new Tree(new Spotter\WordPress(\WP_Data::get()));
@@ -31,10 +34,10 @@ class TreeTest extends TestCase
             null,
             [],
             [
-                'id' => 33,
-                'order' => 1,
+                'id'     => 33,
+                'order'  => 1,
                 'target' => 'https://california.gov',
-                'name' => 'California',
+                'name'   => 'California',
             ],
         ];
         $this->assertEquals($this->test->getLeaf(33), $valid);
@@ -60,6 +63,14 @@ class TreeTest extends TestCase
             [],
             $this->test->getLeafPath(22),
             "Did not correctly return no ancestors (i.e. an empty array)"
+        );
+    }
+
+    public function testIsLeafChildOf()
+    {
+        $this->assertTrue(
+            $this->test->isLeafChildOf(66, 22),
+            "Does not correctly parse ancestors."
         );
     }
 
@@ -145,5 +156,21 @@ class TreeTest extends TestCase
         $this->assertEquals('New Rome', $leafTest->getLeafContent(55, 2, 'name'));
         $this->assertEquals('current', $leafTest->getLeafContent(55, 3));
         $this->assertContains(55, $leafTest->getLeafContent(33, 1));
+    }
+
+    public function testSubTree()
+    {
+        // Test w/o root included
+        $subTree = $this->test->subtree(22); // Make Oregon new root
+        $this->assertInstanceOf('Livy\Climber\Tree', $subTree, "Did not return a Tree object.");
+        $this->assertEquals(3, count($subTree->grow()), "Tree has the wrong number of leaves.");
+        $this->assertEquals(55, $subTree->getLeafContent(66, 0), "Nested parent relationships have changed.");
+        $this->assertFalse($subTree->isLeafChildOf(66, 22), "There are still references to the old root.");
+        unset($subTree);
+        $subTree = $this->test->subtree(22, true); // Make Oregon new root, and include it.
+        $this->assertInstanceOf('Livy\Climber\Tree', $subTree, "Did not return a Tree object.");
+        $this->assertEquals(4, count($subTree->grow()), "Tree has the wrong number of leaves.");
+        $this->assertEquals(55, $subTree->getLeafContent(66, 0), "Nested parent relationships have changed.");
+        $this->assertTrue($subTree->isLeafChildOf(66, 22), "References to the root have been removed.");
     }
 }
