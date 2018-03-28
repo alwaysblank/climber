@@ -67,12 +67,12 @@ class Climber implements API\ClimberAPI
     protected $itemOutputHooks = [];
     protected $linkHooks       = [];
 
-    public function __construct(Tree $tree, $currentUrl = null)
+    public function __construct(Tree $tree, $activeUrl = null)
     {
         $this->tree = $tree;
 
-        if ($currentUrl) {
-            $this->setCurrentUrl($currentUrl);
+        if (null !== $activeUrl) {
+            $this->setCurrentUrl($activeUrl);
         }
 
         /**
@@ -162,8 +162,8 @@ class Climber implements API\ClimberAPI
     /**
      * Sets the passed URL as active.
      *
-     * @param      $url
-     * @param bool $strict
+     * @param string $url
+     * @param bool   $strict
      * @return Climber $this
      */
     public function setCurrentUrl($url, $strict = true)
@@ -543,8 +543,8 @@ class Climber implements API\ClimberAPI
         ]);
 
         return sprintf(
-            /** @lang text
-             * Interpret this as text so PHPStorm doesn't try to find the file. */
+        /** @lang text
+         * Interpret this as text so PHPStorm doesn't try to find the file. */
             '<a href="%1$s" class="%2$s" %3$s>%4$s</a>',
             $linkData['link'],
             $linkData['class'],

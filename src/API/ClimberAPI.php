@@ -15,10 +15,10 @@ interface ClimberAPI
      * Sets up the `$tree`, and adds active classes to the appropriate leaves,
      * if `$currentUrl` matches to a leaf target.
      *
-     * @param Tree $tree
-     * @param string $currentUrl
+     * @param Tree   $tree
+     * @param string $activeUrl
      */
-    public function __construct(Tree $tree, $currentUrl = null);
+    public function __construct(Tree $tree, $activeUrl = null);
 
     /**
      * If `Climber` is treated as a string, print out a <ul></ul>.
@@ -33,7 +33,7 @@ interface ClimberAPI
      * Don't try to get non-existent properties. If you want to modify what someone
      * gets, do it here.
      *
-     * @param string $property  Name of property to get.
+     * @param string $property Name of property to get.
      * @return mixed            Returns bool `false` if property does not exist.
      */
     public function __get(string $property);
@@ -49,8 +49,8 @@ interface ClimberAPI
      * then `$value` is passed to it before being
      * added.
      *
-     * @param string $property      Property we want to set.
-     * @param mixed $value          Value we want to set $property to.
+     * @param string $property Property we want to set.
+     * @param mixed  $value    Value we want to set $property to.
      * @return mixed                $value if $this->$property is setable, bool `false` otherwise.
      */
     public function __set(string $property, $value = null);
@@ -78,7 +78,7 @@ interface ClimberAPI
      * `$strict` is `false`, then it tests the path, queries, and fragments
      * against one another with `parse_url`.
      *
-     * @param string $target
+     * @param string  $target
      * @param boolean $strict
      * @return array
      */
@@ -135,8 +135,8 @@ interface ClimberAPI
      * can pass anything to $callback that would be accepted as an
      * argument for `call_user_func()`.
      *
-     * @param string $location
-     * @param mixed $callback
+     * @param string      $location
+     * @param mixed       $callback
      * @param int|boolean $order
      * @return void
      */
