@@ -6,15 +6,15 @@ use \Zenodorus as Z;
 
 /**
  * Class Climber
- * @property Tree $tree
+ * @property Tree   $tree
  * @property string $topClass
  * @property string $menuClass
  * @property string $itemClass
  * @property string $linkClass
- * @property array $topAttr
- * @property array $menuAttr
- * @property array $itemAttr
- * @property array $linkAttr
+ * @property array  $topAttr
+ * @property array  $menuAttr
+ * @property array  $itemAttr
+ * @property array  $linkAttr
  *
  * @package Livy\Climber
  */
@@ -188,6 +188,16 @@ class Climber implements API\ClimberAPI
             }
         }
         return $this;
+    }
+
+    /**
+     * Does this menu have any activated leaves?
+     *
+     * @return bool
+     */
+    public function isActivated()
+    {
+        return count(array_column($this->tree->grow(), 3)) > 0;
     }
 
     public function activate(int $hint)
