@@ -104,6 +104,10 @@ class Tree implements API\TreeAPI
         $this->nursery($spotter);
     }
 
+    /**
+     * @param Spotter $spotter
+     * @return array|bool|null
+     */
     public function nursery($spotter)
     {
         try {

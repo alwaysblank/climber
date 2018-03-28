@@ -2,6 +2,8 @@
 
 namespace Livy\Climber\API;
 
+use Livy\Climber\Spotter\Spotter;
+
 /**
  * This defines the API for the Livy\Tree to help insure consistent behavior
  * in future versions of the software.
@@ -28,7 +30,7 @@ interface TreeAPI
      * a new tree after this Tree has been instantiated. That's not really
      * recommended, though.
      *
-     * @param object $spotter An object in a class that extends
+     * @param Spotter $spotter  An object in a class that extends
      *                          Spotter\Spotter.
      * @return array
      * @throws \Exception
@@ -62,7 +64,7 @@ interface TreeAPI
      * return `null` if you pass a value to data other than `null` when
      * accessing any slot other than 2.
      *
-     * @param integer $id
+     * @param integer    $id
      * @param int|string $slot
      * @param int|string $data
      * @return mixed
@@ -73,7 +75,7 @@ interface TreeAPI
      * Find the ancestors of a particular leaf.
      *
      * @param integer $id
-     * @param array $ancestors
+     * @param array   $ancestors
      * @return array
      */
     public function getLeafPath(int $id, array $ancestors = []);
@@ -109,9 +111,9 @@ interface TreeAPI
      * @see Tree::setActive()           Set active state.
      *
      *
-     * @param integer $id
+     * @param integer        $id
      * @param integer|string $slot
-     * @param mixed $value
+     * @param mixed          $value
      * @return mixed|boolean    Returns the value set if successful, `false` if
      *                          not.
      */

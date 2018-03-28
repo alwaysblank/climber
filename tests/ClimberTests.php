@@ -7,6 +7,15 @@ use \PHPUnit\Framework\TestCase;
 
 class ClimberTest extends TestCase
 {
+    /**
+     * @var Tree
+     */
+    protected $tree;
+    /**
+     * @var Climber
+     */
+    protected $test;
+
     protected function setUp()
     {
         $this->tree = new Tree(new Spotter\WordPress(\WP_Data::get()));
@@ -18,7 +27,7 @@ class ClimberTest extends TestCase
         $this->assertInstanceOf(Tree::class, $this->tree, "The source is not a valid Tree.");
         $this->assertInstanceOf(Climber::class, $this->test, "The test item is not a valid Climber.");
     }
-    
+
     public function testBasicMenu()
     {
         $this->assertEquals(
@@ -30,7 +39,7 @@ class ClimberTest extends TestCase
 
     public function testNoMenu()
     {
-        $nullMenu = new Climber(new Tree(new Spotter\WordPress(null)));
+        $nullMenu  = new Climber(new Tree(new Spotter\WordPress(null)));
         $falseMenu = new Climber(new Tree(new Spotter\WordPress(false)));
         $this->assertNull($nullMenu->element());
         $this->assertNull($falseMenu->element());
@@ -129,7 +138,7 @@ class ClimberTest extends TestCase
             'Cannot correctly identify leaf by target.'
         );
     }
-    
+
     public function testActivate()
     {
         $activateTest = new Climber(

@@ -4,6 +4,20 @@ namespace Livy\Climber;
 
 use \Zenodorus as Z;
 
+/**
+ * Class Climber
+ * @property Tree $tree
+ * @property string $topClass
+ * @property string $menuClass
+ * @property string $itemClass
+ * @property string $linkClass
+ * @property array $topAttr
+ * @property array $menuAttr
+ * @property array $itemAttr
+ * @property array $linkAttr
+ *
+ * @package Livy\Climber
+ */
 class Climber implements API\ClimberAPI
 {
     protected $setable = [
@@ -343,16 +357,16 @@ class Climber implements API\ClimberAPI
             foreach ($processed as $attr => $value) {
                 if (is_string($value)) {
                     $return .= ' ' . sprintf(
-                            '%s="%s"',
-                            Z\Strings::clean($attr, "-", "/[^[:alnum:]-]/u"),
-                            htmlspecialchars($value, ENT_QUOTES)
-                        );
+                        '%s="%s"',
+                        Z\Strings::clean($attr, "-", "/[^[:alnum:]-]/u"),
+                        htmlspecialchars($value, ENT_QUOTES)
+                    );
                 } elseif (true === $value) {
                     $return .= ' ' . Z\Strings::clean(
-                            $attr,
-                            "-",
-                            "/[^[:alnum:]-]/u"
-                        );
+                        $attr,
+                        "-",
+                        "/[^[:alnum:]-]/u"
+                    );
                 }
             }
 
@@ -543,8 +557,8 @@ class Climber implements API\ClimberAPI
         ]);
 
         return sprintf(
-        /** @lang text
-         * Interpret this as text so PHPStorm doesn't try to find the file. */
+            /** @lang text
+            * Interpret this as text so PHPStorm doesn't try to find the file. */
             '<a href="%1$s" class="%2$s" %3$s>%4$s</a>',
             $linkData['link'],
             $linkData['class'],
