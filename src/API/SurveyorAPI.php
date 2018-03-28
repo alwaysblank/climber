@@ -25,8 +25,11 @@ interface SurveyorAPI
     /**
      * Evaluate a URL against our list of routes.
      *
+     * Returns the matched URL, if a match exists, and $currentUrl if no match exists. This allows the user to insert
+     * Surveyor directly into a normal Climber call, since it will pass the URL through if it doesn't hit any matches.
+     *
      * @param string $currentUrl
-     * @return null
+     * @return string
      */
     public function evaluateUrl(string $currentUrl);
 }

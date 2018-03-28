@@ -32,6 +32,6 @@ class Surveyor implements SurveyorAPI
             }
         }
 
-        return null;
+        return $currentUrl;
     }
 }

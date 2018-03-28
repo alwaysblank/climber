@@ -30,11 +30,13 @@ class SurveyorTest extends TestCase
     public function testNotMatching()
     {
         $Surveyor = new Surveyor($this::ROUTES);
-        $this->assertNull(
+        $this->assertEquals(
+            'https://example.com/',
             $Surveyor->evaluateUrl('https://example.com/'),
             'Incorrectly matching base URL.'
         );
-        $this->assertNull(
+        $this->assertEquals(
+            'https://example.com/storie',
             $Surveyor->evaluateUrl('https://example.com/storie'),
             'Incorrectly matching partial URL.'
         );
