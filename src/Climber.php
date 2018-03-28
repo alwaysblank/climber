@@ -7,15 +7,15 @@ use \Zenodorus as Z;
 class Climber implements API\ClimberAPI
 {
     protected $setable = [
-      'tree',
-      'topClass',
-      'menuClass',
-      'itemClass',
-      'linkClass',
-      'topAttr',
-      'menuAttr',
-      'itemAttr',
-      'linkAttr',
+        'tree',
+        'topClass',
+        'menuClass',
+        'itemClass',
+        'linkClass',
+        'topAttr',
+        'menuAttr',
+        'itemAttr',
+        'linkAttr',
     ];
 
     protected $hookable = [
@@ -35,7 +35,7 @@ class Climber implements API\ClimberAPI
      *
      * @var string
      */
-    protected $topClass = 'simpleMenu';
+    protected $topClass  = 'simpleMenu';
     protected $menuClass = 'simpleMenu__menu';
     protected $itemClass = 'simpleMenu__item';
     protected $linkClass = 'simpleMenu__link';
@@ -50,7 +50,7 @@ class Climber implements API\ClimberAPI
      *
      * @var array
      */
-    protected $topAttr = [];
+    protected $topAttr  = [];
     protected $menuAttr = [];
     protected $itemAttr = [];
     protected $linkAttr = [];
@@ -61,74 +61,70 @@ class Climber implements API\ClimberAPI
      *
      * @var array
      */
-    protected $topHooks = [];
-    protected $menuHooks = [];
-    protected $itemHooks = [];
+    protected $topHooks        = [];
+    protected $menuHooks       = [];
+    protected $itemHooks       = [];
     protected $itemOutputHooks = [];
-    protected $linkHooks = [];
+    protected $linkHooks       = [];
 
     public function __construct(Tree $tree, $currentUrl = null)
     {
         $this->tree = $tree;
 
         if ($currentUrl) {
-            if (count($currentLeaves = $this->getLeafByTarget($currentUrl)) > 0) {
-                foreach ($currentLeaves as $leaf) {
-                    $this->activate($leaf);
+            $this->setCurrentUrl($currentUrl);
+        }
+
+        /**
+         * Add 'active' classes to items that are active (i.e. the
+         * contain the url we're at, or its ancestors.)
+         */
+        $this->hook(
+            'item',
+            function ($data) {
+                if (isset($data['bud'][3])) {
+                    $data['class'] = Z\Strings::addNew(
+                        sprintf(
+                            "%s--%s",
+                            $this->itemClass,
+                            $data['bud'][3]
+                        ),
+                        $data['class']
+                    );
                 }
+
+                return $data;
             }
+        );
 
-            /**
-             * Add 'active' classes to items that are active (i.e. the
-             * contain the url we're at, or its ancestors.)
-             */
-            $this->hook(
-                'item',
-                function ($data) {
-                    if (isset($data['bud'][3])) {
-                        $data['class'] = Z\Strings::addNew(
-                            sprintf(
-                                "%s--%s",
-                                $this->itemClass,
-                                $data['bud'][3]
-                            ),
-                            $data['class']
-                        );
-                    }
-
-                    return $data;
-                }
-            );
-
-            /**
-             * Add an 'active' class to menus that contain an active item (i.e.
-             * an item containing the url we're at.)
-            */
-            $this->hook(
-                'menu',
-                function ($data) {
-                    if ($branch = Z\Arrays::pluck($data['bud'], [2, 'id'], true)
-                    ) {
-                        // if leaf has $branch as parent and active == true
-                        foreach ($this->tree->grow() as $key => $leaf) {
-                            if (isset($leaf[3])
-                                && (int) $branch === (int) $leaf[0]) {
-                                $data['class'] = Z\Strings::addNew(
-                                    sprintf(
-                                        "%s--%s",
-                                        $this->menuClass,
-                                        'active'
-                                    ),
-                                    $data['class']
-                                );
-                            }
+        /**
+         * Add an 'active' class to menus that contain an active item (i.e.
+         * an item containing the url we're at.)
+         */
+        $this->hook(
+            'menu',
+            function ($data) {
+                if ($branch = Z\Arrays::pluck($data['bud'], [2, 'id'], true)
+                ) {
+                    // if leaf has $branch as parent and active == true
+                    foreach ($this->tree->grow() as $key => $leaf) {
+                        if (isset($leaf[3])
+                            && (int)$branch === (int)$leaf[0]) {
+                            $data['class'] = Z\Strings::addNew(
+                                sprintf(
+                                    "%s--%s",
+                                    $this->menuClass,
+                                    'active'
+                                ),
+                                $data['class']
+                            );
                         }
                     }
-
-                    return $data;
                 }
-            );
-        }
+
+                return $data;
+            }
+        );
     }
 
     public function getLeafByTarget(string $target, bool $strict = true)
@@ -139,18 +135,18 @@ class Climber implements API\ClimberAPI
             if ($testTarget === $target) {
                 $leaves[] = $id;
             } elseif (!$strict) {
-                $parsedTarget = parse_url($target);
+                $parsedTarget     = parse_url($target);
                 $parsedTestTarget = parse_url($testTarget);
-                $matchPath = isset($parsedTarget['path'])
-                    && isset($parsedTestTarget['path'])
+                $matchPath        = isset($parsedTarget['path'])
+                && isset($parsedTestTarget['path'])
                     ? ($parsedTarget['path'] === $parsedTestTarget['path'])
                     : true;
-                $matchQueries = isset($parsedTarget['query'])
-                    && isset($parsedTestTarget['query'])
+                $matchQueries     = isset($parsedTarget['query'])
+                && isset($parsedTestTarget['query'])
                     ? ($parsedTarget['query'] === $parsedTestTarget['query'])
                     : true;
-                $matchHashes = isset($parsedTarget['fragment'])
-                    && isset($parsedTestTarget['fragment'])
+                $matchHashes      = isset($parsedTarget['fragment'])
+                && isset($parsedTestTarget['fragment'])
                     ? ($parsedTarget['fragment'] === $parsedTestTarget['fragment'])
                     : true;
 
@@ -163,10 +159,27 @@ class Climber implements API\ClimberAPI
         return $leaves;
     }
 
+    /**
+     * Sets the passed URL as active.
+     *
+     * @param      $url
+     * @param bool $strict
+     * @return Climber $this
+     */
+    public function setCurrentUrl($url, $strict = true)
+    {
+        if (count($currentLeaves = $this->getLeafByTarget($url, $strict)) > 0) {
+            foreach ($currentLeaves as $leaf) {
+                $this->activate($leaf);
+            }
+        }
+        return $this;
+    }
+
     public function activate(int $hint)
     {
         if ($leaf = $this->tree->getLeaf($hint)) {
-            $path = $this->tree->getLeafPath($hint);
+            $path   = $this->tree->getLeafPath($hint);
             $path[] = $hint;
             foreach (array_reverse($path) as $order => $id) {
                 switch ($order) {
@@ -187,7 +200,7 @@ class Climber implements API\ClimberAPI
             }
         }
     }
-    
+
     public function hook(string $location, $callback, $order = false)
     {
         $propName = sprintf("%sHooks", $location);
@@ -195,7 +208,7 @@ class Climber implements API\ClimberAPI
             if ($order === false) {
                 return $this->{$propName}[] = $callback;
             } else {
-                return $this->{$propName}[(int) $order] = $callback;
+                return $this->{$propName}[(int)$order] = $callback;
             }
         }
 
@@ -213,12 +226,12 @@ class Climber implements API\ClimberAPI
             $topData = $this->runHook('top', [
                 'class' => $this->topClass,
                 'attrs' => $this->attrs($this->topAttr),
-                'tree' => $this->tree,
-                'echo' => $echo,
+                'tree'  => $this->tree,
+                'echo'  => $echo,
             ]);
 
             $menu = sprintf(
-                '<nav class="%1$s"%2$s>%3$s</nav>',
+                '<nav class="%1$s" %2$s>%3$s</nav>',
                 $topData['class'],
                 $topData['attrs'],
                 $this->branch($this->harvest($topData['tree']))
@@ -240,7 +253,7 @@ class Climber implements API\ClimberAPI
      * $data can be any type of data, but will usually be an array.
      *
      * @param string $location
-     * @param mixed $data
+     * @param mixed  $data
      * @return mixed
      */
     protected function runHook(string $location, $data)
@@ -255,48 +268,48 @@ class Climber implements API\ClimberAPI
         return $data;
     }
 
-  /**
-   * Creates a string from an array of attribute pairs.
-   *
-   * Arrays passed to this method should use the following format:
-   *
-   * ```
-   *   [
-   *      ['target', '_blank'],
-   *      ['disabled'],
-   *      ['data-menu', '#primary'],
-   *   ]
-   * ```
-   *
-   * You can remove an attribute by passing `false` as the second value:
-   *
-   * ```
-   *    [
-   *       ['target', '_blank'],
-   *       ['target', false],
-   *    ]
-   * ```
-   *
-   * This would result in *no* `target` attribute appearing on the element.
-   *
-   * Subsequent attributes will override previousl ones:
-   *
-   * ```
-   *    [
-   *       ['data-star', 'wars'],
-   *       ['data-star', 'trek'],
-   *    ]
-   * ```
-   *
-   * This would result in:
-   *
-   * ```
-   * <element data-star="trek"></element>
-   * ```
-   *
-   * @param array $attrs          Collection of attribute pairs in an array.
-   * @return string|null          Returns the complete string if viable, null otherwise.
-   */
+    /**
+     * Creates a string from an array of attribute pairs.
+     *
+     * Arrays passed to this method should use the following format:
+     *
+     * ```
+     *   [
+     *      ['target', '_blank'],
+     *      ['disabled'],
+     *      ['data-menu', '#primary'],
+     *   ]
+     * ```
+     *
+     * You can remove an attribute by passing `false` as the second value:
+     *
+     * ```
+     *    [
+     *       ['target', '_blank'],
+     *       ['target', false],
+     *    ]
+     * ```
+     *
+     * This would result in *no* `target` attribute appearing on the element.
+     *
+     * Subsequent attributes will override previousl ones:
+     *
+     * ```
+     *    [
+     *       ['data-star', 'wars'],
+     *       ['data-star', 'trek'],
+     *    ]
+     * ```
+     *
+     * This would result in:
+     *
+     * ```
+     * <element data-star="trek"></element>
+     * ```
+     *
+     * @param array $attrs Collection of attribute pairs in an array.
+     * @return string|null          Returns the complete string if viable, null otherwise.
+     */
     protected function attrs(array $attrs)
     {
         if (!Z\Arrays::isEmpty($attrs)) {
@@ -330,16 +343,16 @@ class Climber implements API\ClimberAPI
             foreach ($processed as $attr => $value) {
                 if (is_string($value)) {
                     $return .= ' ' . sprintf(
-                        '%s="%s"',
-                        Z\Strings::clean($attr, "-", "/[^[:alnum:]-]/u"),
-                        htmlspecialchars($value, ENT_QUOTES)
-                    );
+                            '%s="%s"',
+                            Z\Strings::clean($attr, "-", "/[^[:alnum:]-]/u"),
+                            htmlspecialchars($value, ENT_QUOTES)
+                        );
                 } elseif (true === $value) {
                     $return .= ' ' . Z\Strings::clean(
-                        $attr,
-                        "-",
-                        "/[^[:alnum:]-]/u"
-                    );
+                            $attr,
+                            "-",
+                            "/[^[:alnum:]-]/u"
+                        );
                 }
             }
 
@@ -385,11 +398,11 @@ class Climber implements API\ClimberAPI
                 : $this->menuClass,
             'level' => $level,
             'attrs' => $this->attrs($this->menuAttr),
-            'bud' => $bud,
+            'bud'   => $bud,
         ]);
 
         return sprintf(
-            '<ul class="%1$s level-%2$s"%3$s>%4$s</ul>',
+            '<ul class="%1$s level-%2$s" %3$s>%4$s</ul>',
             $menuData['class'],
             $menuData['level'],
             $menuData['attrs'],
@@ -451,7 +464,7 @@ class Climber implements API\ClimberAPI
      * Safely return a value for $property with $value
      * appended to the end of the array.
      *
-     * @param mixed $value
+     * @param mixed  $value
      * @param string $property
      * @return array
      */
@@ -492,12 +505,12 @@ class Climber implements API\ClimberAPI
         $itemData = $this->runHook('item', [
             'class' => $this->itemClass,
             'attrs' => $this->attrs($this->itemAttr),
-            'bud' => $bud,
+            'bud'   => $bud,
         ]);
 
         $itemOutput = $this->runHook('itemOutput', [
             'format' => '%1$s%2$s',
-            'args' => [
+            'args'   => [
                 $this->fruit($bud),
                 $this->branch($bud),
             ],
@@ -505,7 +518,7 @@ class Climber implements API\ClimberAPI
 
         return vsprintf(
             sprintf(
-                '<li class="%1$s"%2$s>%3$s</li>',
+                '<li class="%1$s" %2$s>%3$s</li>',
                 $itemData['class'],
                 $itemData['attrs'],
                 $itemOutput['format']
@@ -514,23 +527,25 @@ class Climber implements API\ClimberAPI
         );
     }
 
-  /**
-   * Sprout a link.
-   *
-   * @param array $bud
-   * @return string
-   */
+    /**
+     * Sprout a link.
+     *
+     * @param array $bud
+     * @return string
+     */
     protected function fruit(array $bud)
     {
         $linkData = $this->runHook('link', [
-            'link' => Z\Arrays::pluck($bud, [2, 'target']),
-            'class' => $this->linkClass,
-            'attrs' => $this->attrs($this->linkAttr),
+            'link'    => Z\Arrays::pluck($bud, [2, 'target']),
+            'class'   => $this->linkClass,
+            'attrs'   => $this->attrs($this->linkAttr),
             'content' => Z\Arrays::pluck($bud, [2, 'name']),
         ]);
 
         return sprintf(
-            '<a href="%1$s" class="%2$s"%3$s>%4$s</a>',
+            /** @lang text
+             * Interpret this as text so PHPStorm doesn't try to find the file. */
+            '<a href="%1$s" class="%2$s" %3$s>%4$s</a>',
             $linkData['link'],
             $linkData['class'],
             $linkData['attrs'],
