@@ -73,7 +73,7 @@ HTML attributes.
  */
 $Climber = new Climber(
   new Tree(new Spotter\WordPress(wp_get_nav_menu_items($menuID))),
-  get_permalink(get_the_ID())   // This returns the URL for the current page.
+  get_permalink(get_the_ID()))   // This returns the URL for the current page.
 );
 
 /**
@@ -398,3 +398,70 @@ Same as `pulley__wp_get_menu_by_location()`, just echoes.
 
 _string | false_ HTML string of the menu if successful, boolean `false`
 otherwise.
+
+## That's Not Complicated Enough
+
+All right, fair. Maybe you need something we haven't covered here: Maybe the menu you're passing to Climber only
+includes the top level of your site, but you want parent items to still be highlighted when their children are being
+visited. Since Climber is (by design) ignorant of your site's internal organization, it doesn't directly support this:
+Climber is only aware of the things its aware of.
+
+You can, however, use a bit of logic to tell Climber what it should consider "active".
+
+### Set Current URL
+
+The most common usage of Climber involves passing a URL to it on instantiation—either with the class directly, or
+through one of the helper functions. In either case, internally Climber is using the same method to activate the
+current URL, and it's a method you can use too!
+
+`Climber::setCurrentUrl()` can be used to pass a URL directly to Climber. Climber will then look for a leaf (or leaves)
+that point to that URL, and mark them as "active" (if you have a multi-level menu, it will also mark their ancestors as
+well). Using it is very simple:
+
+```php
+$Climber = new Climber(
+  new Tree(new Spotter\WordPress(wp_get_nav_menu_items($menuID)))
+);
+$Climber->setCurrentURL(get_permalink(get_the_ID())); // Now this is the current URL!
+```
+
+If the Climber you're working with doesn't have that URL, it will do nothing.
+
+It is also worth noting that Climber does not assume there can be only one active leaf: Running `setCurrentUrl()` does
+not remove previously active leaves.
+
+Access to `setCurrentUrl()` means that with some elbow grease, you can make Climber think you're on any page you like!
+Unfortunately, if you need to do this with a large number of URLs, `setCurrentUrl()` starts get a little less useful.
+
+That's why there's another way!
+
+### Surveyor
+
+The Surveyor class provides you with a simple way of writing lookups for URL patterns that you want to match particular
+URLs in Climber. It uses an array of regular expressions to determine what URLs match what. 
+
+To use Surveyor, instantiate it with an array of regular expressions and URLs, and then call `Surveyor::evaluateUrl()`:
+
+```php
+$Surveyor = new Surveyord([
+    ['/(?:stories\/bedtime\/[\w_-]*)/', 'https://example.com/stories/bedtime/'],
+    ['/(?:stories(?:|\/[\w_-]*))/', 'https://example.com/stories/'],
+]);
+echo $Surveyor->evaluateUrl('https://example.com/stories/bedtime/goodnight-moon');
+// Yields `https://example.com/stories/bedtime/`
+```
+
+Possible URLs are evaluated in sequence, and returned as soon as a match is found. If no match is found, then the URL
+originally passe dto `evaluateUrl()` is returned. This means that you can easily use Surveyor inside a Climber call, and
+it will fall back to whatever Climber wants to do with that URL if no matches are found. Like so:
+
+```php
+$Surveyor = new Surveyord([
+    ['/(?:stories\/bedtime\/[\w_-]*)/', 'https://example.com/stories/bedtime/'],
+    ['/(?:stories(?:|\/[\w_-]*))/', 'https://example.com/stories/'],
+]);
+$Climber = new Climber(
+  new Tree(new Spotter\WordPress(wp_get_nav_menu_items($menuID))),
+  $Surveyor->evaluateUrl(get_permalink(get_the_ID()))
+);
+```
