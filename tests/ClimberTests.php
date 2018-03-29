@@ -176,12 +176,28 @@ class ClimberTest extends TestCase
         );
     }
 
-//    public function testSubTree()
-//    {
-//        $fullTree = new Climber(
-//            $this->tree,
-//            'https://oregon.gov/corvallis/osu'
-//        );
-//        $subTree = $fullTree->sub()
-//    }
+    public function testIsActivated()
+    {
+        $activateElementTest = new Climber(
+            $this->tree,
+            'https://oregon.gov/corvallis/osu'
+        );
+        $this->assertTrue(
+            $activateElementTest->isActivated(),
+            'Did not correctly detect activation.'
+        );
+    }
+
+    public function testSetCurrentUrl()
+    {
+        $setCurrentUrlTest = new Climber(
+            $this->tree
+        );
+        $setCurrentUrlTest->setCurrentUrl('https://oregon.gov/corvallis/osu');
+        $this->assertEquals(
+            \Storage::$ActivatedMenuStringExpected,
+            $setCurrentUrlTest->element(),
+            'Could not set URL after instantiation.'
+        );
+    }
 }

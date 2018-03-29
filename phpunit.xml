@@ -17,6 +17,9 @@
     <filter>
         <whitelist processUncoveredFilesFromWhitelist="true">
             <directory suffix=".php">./src/</directory>
+            <exclude>
+                <file>./src/func/function_loader.php</file>
+            </exclude>
         </whitelist>
     </filter>
 </phpunit>
