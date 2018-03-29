@@ -2,7 +2,7 @@
 
 namespace Livy\Climber;
 
-use \Zenodorus as Z;
+use Zenodorus as Z;
 
 /**
  * Class Climber
@@ -141,6 +141,16 @@ class Climber implements API\ClimberAPI
         );
     }
 
+    public function setCurrentUrl($url, $strict = true)
+    {
+        if (count($currentLeaves = $this->getLeafByTarget($url, $strict)) > 0) {
+            foreach ($currentLeaves as $leaf) {
+                $this->activate($leaf);
+            }
+        }
+        return $this;
+    }
+
     public function getLeafByTarget(string $target, bool $strict = true)
     {
         $leaves = [];
@@ -171,21 +181,6 @@ class Climber implements API\ClimberAPI
         }
 
         return $leaves;
-    }
-
-    public function setCurrentUrl($url, $strict = true)
-    {
-        if (count($currentLeaves = $this->getLeafByTarget($url, $strict)) > 0) {
-            foreach ($currentLeaves as $leaf) {
-                $this->activate($leaf);
-            }
-        }
-        return $this;
-    }
-
-    public function isActivated()
-    {
-        return count(array_column($this->tree->grow(), 3)) > 0;
     }
 
     public function activate(int $hint)
@@ -225,6 +220,11 @@ class Climber implements API\ClimberAPI
         }
 
         return null;
+    }
+
+    public function isActivated()
+    {
+        return count(array_column($this->tree->grow(), 3)) > 0;
     }
 
     public function __toString()

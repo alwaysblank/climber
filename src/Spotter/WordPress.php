@@ -5,11 +5,11 @@ namespace Livy\Climber\Spotter;
 class WordPress extends Spotter
 {
     public $expected = [
-        'ID' => 'id',
+        'ID'               => 'id',
         'menu_item_parent' => 'parent',
-        'menu_order' => 'order',
-        'url' => 'target',
-        'title' => 'name',
+        'menu_order'       => 'order',
+        'url'              => 'target',
+        'title'            => 'name',
     ];
 
     /**
@@ -20,7 +20,7 @@ class WordPress extends Spotter
         $temp = [];
         foreach ($this->seed as $item) {
             $temp[$item->ID] = [];
-            
+
             // If there's no parent, `parent` should be null
             if ($item->menu_item_parent == 0) {
                 $item->menu_item_parent = null;

@@ -1,5 +1,6 @@
 <?php
-use \Livy\Climber;
+
+use Livy\Climber;
 
 // phpcs:disable
 $GLOBALS['livy_climber_helper_func_loaded']['common'] = true;
@@ -8,10 +9,10 @@ $GLOBALS['livy_climber_helper_func_loaded']['common'] = true;
 /**
  * Returns a Climber object.
  *
- * @param Spotter/[ClassName] $spotter      An instance of a class that
+ * @param Livy\Climber\Spotter\[ClassName] $spotter      An instance of a class that
  *                                          extends Spotter/Spotter.
  * @param string $currentUrl                The URL of the current page.
- * @return Climber|boolean
+ * @return Livy\Climber\Climber|boolean
  */
 function pulley__get_menu($spotter, string $currentUrl = null)
 {
@@ -32,10 +33,10 @@ function pulley__get_menu($spotter, string $currentUrl = null)
  *
  * @see pulley__getMenu()
  *
- * @param Spotter/[ClassName] $spotter      An instance of a class that
+ * @param Livy\Climber\Spotter\[ClassName] $spotter      An instance of a class that
  *                                          extends Spotter/Spotter.
  * @param string $currentUrl                The URL of the current page.
- * @return string
+ * @return void
  */
 function pulley__menu($spotter, string $currentUrl = null)
 {

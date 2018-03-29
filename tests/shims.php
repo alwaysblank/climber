@@ -114,8 +114,8 @@ class WP_Term
  * validated as `WP_Term` object.
  *
  * @param integer $integer
- * @param string $type
- * @return void
+ * @param string  $type
+ * @return bool|WP_Term
  */
 function get_term($integer, $type)
 {

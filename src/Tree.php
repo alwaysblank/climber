@@ -4,7 +4,7 @@ namespace Livy\Climber;
 
 use Livy\Climber\Spotter\Forester;
 use Livy\Climber\Spotter\Spotter;
-use \Zenodorus as Z;
+use Zenodorus as Z;
 
 /**
  * This class generates data trees for processing by Climber.
@@ -172,34 +172,19 @@ class Tree implements API\TreeAPI
         return null;
     }
 
-    public function getLeafPath(int $id, array $ancestors = [])
+    public function getLeafSiblings(int $id, bool $exclude = null)
     {
-        if (null === $this->getLeaf($id)
-            || null === $this->getLeafContent($id, 0)) {
-            // This item doesn't exist or has no ancestors.
-            // Either we've reached the last step in our path, we were passed
-            // a bad leaf, or this leaf has no parent.
-            return array_reverse($ancestors);
+        $parent   = $this->getLeafContent($id, 'parent');
+        $tree     = $this->tree;
+        $siblings = array_filter($tree, function ($item) use ($parent) {
+            return $item[0] == $parent;
+        });
+
+        if ($exclude) {
+            unset($siblings[$id]);
         }
 
-        array_push($ancestors, $this->getLeafContent($id, 0));
-
-        return $this->getLeafPath($this->getLeafContent($id, 0), $ancestors);
-    }
-
-    public function isLeafChildOf(int $leaf, int $parent)
-    {
-        $ancestors = $this->getLeafPath($leaf);
-        if (count($ancestors) > 0 && in_array($parent, $ancestors)) {
-            return true;
-        }
-
-        return false;
-    }
-
-    public function getLeaf(int $id)
-    {
-        return isset($this->tree[$id]) ? $this->tree[$id] : null;
+        return $siblings;
     }
 
     public function getLeafContent(int $id, $slot, $data = null)
@@ -242,19 +227,9 @@ class Tree implements API\TreeAPI
         return false;
     }
 
-    public function getLeafSiblings(int $id, bool $exclude = null)
+    public function getLeaf(int $id)
     {
-        $parent   = $this->getLeafContent($id, 'parent');
-        $tree     = $this->tree;
-        $siblings = array_filter($tree, function ($item) use ($parent) {
-            return $item[0] == $parent;
-        });
-
-        if ($exclude) {
-            unset($siblings[$id]);
-        }
-
-        return $siblings;
+        return isset($this->tree[$id]) ? $this->tree[$id] : null;
     }
 
     public function setLeaf(int $id, array...$actions)
@@ -625,16 +600,6 @@ class Tree implements API\TreeAPI
     }
 
     /**
-     * We want to know if we're the original or not, so set `$clone`.
-     *
-     * @return void
-     */
-    protected function __clone()
-    {
-        $this->clone = true;
-    }
-
-    /**
      * Takes a leaf and returns a new Tree composed of only the children of that leaf.
      *
      * To include the root in the returned Tree, pass `true` to the second parameter.
@@ -664,12 +629,47 @@ class Tree implements API\TreeAPI
         );
     }
 
+    public function isLeafChildOf(int $leaf, int $parent)
+    {
+        $ancestors = $this->getLeafPath($leaf);
+        if (count($ancestors) > 0 && in_array($parent, $ancestors)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function getLeafPath(int $id, array $ancestors = [])
+    {
+        if (null === $this->getLeaf($id)
+            || null === $this->getLeafContent($id, 0)) {
+            // This item doesn't exist or has no ancestors.
+            // Either we've reached the last step in our path, we were passed
+            // a bad leaf, or this leaf has no parent.
+            return array_reverse($ancestors);
+        }
+
+        array_push($ancestors, $this->getLeafContent($id, 0));
+
+        return $this->getLeafPath($this->getLeafContent($id, 0), $ancestors);
+    }
+
     /**
      * Sometimes we don't want to be a clone after all.
      */
     public function declone()
     {
         $this->clone = false;
+    }
+
+    /**
+     * We want to know if we're the original or not, so set `$clone`.
+     *
+     * @return void
+     */
+    protected function __clone()
+    {
+        $this->clone = true;
     }
 
     /**

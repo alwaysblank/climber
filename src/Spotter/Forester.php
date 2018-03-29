@@ -40,8 +40,8 @@ class Forester extends Spotter
         }
 
         return [
-          'parent' => $data[0],
-          'data' => isset($data[2]) ? $data[2] : [],
+            'parent' => $data[0],
+            'data'   => isset($data[2]) ? $data[2] : [],
         ];
     }
 }

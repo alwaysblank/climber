@@ -1,5 +1,6 @@
 <?php
-use \Livy\Climber;
+
+use Livy\Climber;
 
 // phpcs:disable
 $GLOBALS['livy_climber_helper_func_loaded']['wp'] = true;
@@ -20,8 +21,8 @@ $GLOBALS['livy_climber_helper_func_loaded']['wp'] = true;
  * `wp_get_nave_menu_items()`.
  *
  * @param int|string|WP_Term $menu
- * @param string $currentUrl
- * @return Climber
+ * @param string             $currentUrl
+ * @return Livy\Climber\Climber
  */
 function pulley__wp_get_menu($menu, string $currentUrl = null)
 {
@@ -37,7 +38,7 @@ function pulley__wp_get_menu($menu, string $currentUrl = null)
  * @see pulley__wp_get_menu()
  *
  * @param int|string|WP_Term $menu
- * @param string $currentUrl
+ * @param string             $currentUrl
  * @return void
  */
 function pulley__wp_menu($menu, string $currentUrl = null)
@@ -53,7 +54,7 @@ function pulley__wp_menu($menu, string $currentUrl = null)
  *
  * @param string $location
  * @param string $currentUrl
- * @return Climber
+ * @return Livy\Climber\Climber|boolean
  */
 function pulley__wp_get_menu_by_location(
     string $location,
