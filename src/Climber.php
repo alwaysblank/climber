@@ -173,13 +173,6 @@ class Climber implements API\ClimberAPI
         return $leaves;
     }
 
-    /**
-     * Sets the passed URL as active.
-     *
-     * @param string $url
-     * @param bool   $strict
-     * @return Climber $this
-     */
     public function setCurrentUrl($url, $strict = true)
     {
         if (count($currentLeaves = $this->getLeafByTarget($url, $strict)) > 0) {
@@ -190,11 +183,6 @@ class Climber implements API\ClimberAPI
         return $this;
     }
 
-    /**
-     * Does this menu have any activated leaves?
-     *
-     * @return bool
-     */
     public function isActivated()
     {
         return count(array_column($this->tree->grow(), 3)) > 0;

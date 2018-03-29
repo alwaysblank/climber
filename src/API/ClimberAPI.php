@@ -2,6 +2,7 @@
 
 namespace Livy\Climber\API;
 
+use Livy\Climber\Climber;
 use Livy\Climber\Tree;
 
 /**
@@ -66,6 +67,22 @@ interface ClimberAPI
      * @return void
      */
     public function activate(int $hint);
+
+    /**
+     * Does this menu have any activated leaves?
+     *
+     * @return bool
+     */
+    public function isActivated();
+
+    /**
+     * Sets the passed URL as active.
+     *
+     * @param string $url
+     * @param bool   $strict
+     * @return Climber $this
+     */
+    public function setCurrentUrl($url, $strict = true);
 
     /**
      * Gets zero or more leaves, based on their target.
