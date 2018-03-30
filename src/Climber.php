@@ -236,14 +236,15 @@ class Climber implements API\ClimberAPI
     {
         if (null != $this->tree->grow()) {
             $topData = $this->runHook('top', [
-                'class' => $this->topClass,
-                'attrs' => $this->attrs($this->topAttr),
-                'tree'  => $this->tree,
-                'echo'  => $echo,
+                'class'   => $this->topClass,
+                'attrs'   => $this->attrs($this->topAttr),
+                'tree'    => $this->tree,
+                'element' => '<nav class="%1$s" %2$s>%3$s</nav>',
+                'echo'    => $echo,
             ]);
 
             $menu = sprintf(
-                '<nav class="%1$s" %2$s>%3$s</nav>',
+                $topData['element'],
                 $topData['class'],
                 $topData['attrs'],
                 $this->branch($this->harvest($topData['tree']))
@@ -405,16 +406,17 @@ class Climber implements API\ClimberAPI
         });
 
         $menuData = $this->runHook('menu', [
-            'class' => $level > 0
+            'class'   => $level > 0
                 ? sprintf('%1$s %1$s--submenu', $this->menuClass)
                 : $this->menuClass,
-            'level' => $level,
-            'attrs' => $this->attrs($this->menuAttr),
-            'bud'   => $bud,
+            'level'   => $level,
+            'attrs'   => $this->attrs($this->menuAttr),
+            'element' => '<ul class="%1$s level-%2$s" %3$s>%4$s</ul>',
+            'bud'     => $bud,
         ]);
 
         return sprintf(
-            '<ul class="%1$s level-%2$s" %3$s>%4$s</ul>',
+            $menuData['element'],
             $menuData['class'],
             $menuData['level'],
             $menuData['attrs'],
@@ -515,9 +517,10 @@ class Climber implements API\ClimberAPI
         $bud = $this->tree->getLeaf($hint);
 
         $itemData = $this->runHook('item', [
-            'class' => $this->itemClass,
-            'attrs' => $this->attrs($this->itemAttr),
-            'bud'   => $bud,
+            'class'   => $this->itemClass,
+            'attrs'   => $this->attrs($this->itemAttr),
+            'element' => '<li class="%1$s" %2$s>%3$s</li>',
+            'bud'     => $bud,
         ]);
 
         $itemOutput = $this->runHook('itemOutput', [
@@ -530,7 +533,7 @@ class Climber implements API\ClimberAPI
 
         return vsprintf(
             sprintf(
-                '<li class="%1$s" %2$s>%3$s</li>',
+                $itemData['element'],
                 $itemData['class'],
                 $itemData['attrs'],
                 $itemOutput['format']
@@ -552,12 +555,15 @@ class Climber implements API\ClimberAPI
             'class'   => $this->linkClass,
             'attrs'   => $this->attrs($this->linkAttr),
             'content' => Z\Arrays::pluck($bud, [2, 'name']),
+            'element' => /** @lang text
+             * Interpret this as text so PHPStorm doesn't try to find the file. */
+                '<a href="%1$s" class="%2$s" %3$s>%4$s</a>',
         ]);
 
         return sprintf(
             /** @lang text
             * Interpret this as text so PHPStorm doesn't try to find the file. */
-            '<a href="%1$s" class="%2$s" %3$s>%4$s</a>',
+            $linkData['element'],
             $linkData['link'],
             $linkData['class'],
             $linkData['attrs'],

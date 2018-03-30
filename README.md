@@ -127,6 +127,7 @@ it provides includes:
 * `class` - *string* The CSS class(es) for this element.
 * `attrs` - *array* An array of HTML attributes for this element.
 * `tree` - *Tree* The Tree instance used for this menu.
+* `element` - *string* Format for `sprintf`, to be used in element generation.
 * `echo` - *boolean* Whether or not `Tree::element()` should echo the menu. Very
   few reasons to change this.
 
@@ -139,6 +140,7 @@ array it provides includes:
 * `class` - *string* The CSS class(es) for this element.
 * `attrs` - *array* An array of HTML attributes for this element.
 * `level` - *integer* The current depth of this menu. Probably don't change it.
+* `element` - *string* Format for `sprintf`, to be used in element generation.
 * `bud` - *array* A full leaf, with all leaf data.
 
 ### `item`
@@ -148,6 +150,7 @@ of your site, and possibly a submenu. The array it provides includes:
 
 * `class` - *string* The CSS class(es) for this element.
 * `attrs` - *array* An array of HTML attributes for this element.
+* `element` - *string* Format for `sprintf`, to be used in element generation.
 * `bud` - *array* A full leaf, with all leaf data.
 
 ### `itemOutput`
@@ -167,6 +170,7 @@ This is a link element in an `item`. The array it provides includes:
 * `link` - *string* The URL this link goes to.
 * `class` - *string* The CSS class(es) for this element.
 * `attrs` - *array* An array of HTML attributes for this element.
+* `element` - *string* Format for `sprintf`, to be used in element generation.
 * `content` - *string* The content of the link element. Usually the name of
   whatever it links to, i.e. "About".
 

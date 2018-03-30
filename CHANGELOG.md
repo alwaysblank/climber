@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.2.1] - 2018-03-30
+### Added
+- Added `element` data part to most filters, allowing users to directly modify the `sprintf` template used to generate the element in questions.
+
 ## [0.2.0] - 2018-03-28
 ### Added
 - `Surveyor` class to allow for regex-based URL matching (for manually setting 'current' URL).
