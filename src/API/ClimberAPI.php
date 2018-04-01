@@ -69,6 +69,14 @@ interface ClimberAPI
     public function activate(int $hint);
 
     /**
+     * Generates full classes w/ the baseClass.
+     *
+     * @param $classFormat
+     * @return string
+     */
+    public function compileClass($classFormat);
+
+    /**
      * Does this menu have any activated leaves?
      *
      * @return bool

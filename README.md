@@ -177,14 +177,17 @@ This is a link element in an `item`. The array it provides includes:
 ## Settings
 
 These settings will be applies to all elements of their type, so they can be
-useful for setting styling or behavior across your menu.
+useful for setting styling or behavior across your menu. The built-in classes
+are formatted strings. You can change them all with one line by modifying
+`baseClass`. You can also override them completely, if you wish.
 
 | Name           | Type      | Default            |
 |----------------|-----------|--------------------|
-| `topClass`     | string    | 'simpleMenu'       |
-| `menuClass`    | string    | 'simpleMenu__menu' |
-| `itemClass`    | string    | 'simpleMenu__item' |
-| `linkClass`    | string    | 'simpleMenu__link' |
+| `baseClass`    | string    | 'simpleMenu'       |
+| `topClass`     | string    | '%s'               |
+| `menuClass`    | string    | '%s__menu'         |
+| `itemClass`    | string    | '%s__item'         |
+| `linkClass`    | string    | '%s__link'         |
 | `topAttr`      | array     | `[]`               |
 | `menuAttr`     | array     | `[]`               |
 | `itemAttr`     | array     | `[]`               |

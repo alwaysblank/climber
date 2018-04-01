@@ -7,6 +7,7 @@ use Zenodorus as Z;
 /**
  * Class Climber
  * @property Tree   $tree
+ * @property string $baseClass
  * @property string $topClass
  * @property string $menuClass
  * @property string $itemClass
@@ -22,6 +23,7 @@ class Climber implements API\ClimberAPI
 {
     protected $setable = [
         'tree',
+        'baseClass',
         'topClass',
         'menuClass',
         'itemClass',
@@ -49,10 +51,11 @@ class Climber implements API\ClimberAPI
      *
      * @var string
      */
-    protected $topClass  = 'simpleMenu';
-    protected $menuClass = 'simpleMenu__menu';
-    protected $itemClass = 'simpleMenu__item';
-    protected $linkClass = 'simpleMenu__link';
+    protected $baseClass = 'simpleMenu';
+    protected $topClass  = '%s';
+    protected $menuClass = '%s__menu';
+    protected $itemClass = '%s__item';
+    protected $linkClass = '%s__link';
 
     /**
      * These props determine element attributes. Modifying them from outside the
@@ -100,7 +103,7 @@ class Climber implements API\ClimberAPI
                     $data['class'] = Z\Strings::addNew(
                         sprintf(
                             "%s--%s",
-                            $this->itemClass,
+                            $this->compileClass($this->itemClass),
                             $data['bud'][3]
                         ),
                         $data['class']
@@ -127,7 +130,7 @@ class Climber implements API\ClimberAPI
                             $data['class'] = Z\Strings::addNew(
                                 sprintf(
                                     "%s--%s",
-                                    $this->menuClass,
+                                    $this->compileClass($this->menuClass),
                                     'active'
                                 ),
                                 $data['class']
@@ -232,11 +235,16 @@ class Climber implements API\ClimberAPI
         return $this->element();
     }
 
+    public function compileClass($classFormat)
+    {
+        return sprintf($classFormat, $this->baseClass);
+    }
+
     public function element($echo = false)
     {
         if (null != $this->tree->grow()) {
             $topData = $this->runHook('top', [
-                'class'   => $this->topClass,
+                'class'   => $this->compileClass($this->topClass),
                 'attrs'   => $this->attrs($this->topAttr),
                 'tree'    => $this->tree,
                 'element' => '<nav class="%1$s" %2$s>%3$s</nav>',
@@ -407,8 +415,8 @@ class Climber implements API\ClimberAPI
 
         $menuData = $this->runHook('menu', [
             'class'   => $level > 0
-                ? sprintf('%1$s %1$s--submenu', $this->menuClass)
-                : $this->menuClass,
+                ? sprintf('%1$s %1$s--submenu', $this->compileClass($this->menuClass))
+                : $this->compileClass($this->menuClass),
             'level'   => $level,
             'attrs'   => $this->attrs($this->menuAttr),
             'element' => '<ul class="%1$s level-%2$s" %3$s>%4$s</ul>',
@@ -517,7 +525,7 @@ class Climber implements API\ClimberAPI
         $bud = $this->tree->getLeaf($hint);
 
         $itemData = $this->runHook('item', [
-            'class'   => $this->itemClass,
+            'class'   => $this->compileClass($this->itemClass),
             'attrs'   => $this->attrs($this->itemAttr),
             'element' => '<li class="%1$s" %2$s>%3$s</li>',
             'bud'     => $bud,
@@ -552,7 +560,7 @@ class Climber implements API\ClimberAPI
     {
         $linkData = $this->runHook('link', [
             'link'    => Z\Arrays::pluck($bud, [2, 'target']),
-            'class'   => $this->linkClass,
+            'class'   => $this->compileClass($this->linkClass),
             'attrs'   => $this->attrs($this->linkAttr),
             'content' => Z\Arrays::pluck($bud, [2, 'name']),
             'element' => /** @lang text

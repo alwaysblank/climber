@@ -63,6 +63,17 @@ class ClimberTest extends TestCase
         $this->assertNotFalse(strpos($this->test->element(), "newLink"), 'Cannot set `$linkClass`.');
     }
 
+    public function testSetBaseClass()
+    {
+        $SetBaseClass = $this->test;
+        $SetBaseClass->baseClass = 'complexMenu';
+        $this->assertEquals(
+            \Storage::$RebasedMenuStringExpected,
+            $SetBaseClass->element(),
+            "CSS rebasing did not working correctly."
+        );
+    }
+
     /**
      * @depends testBasicMenu
      */
