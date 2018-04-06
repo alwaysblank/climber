@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.2.3] - 2018-03-31
+### Added
+- Added `Simple` Spotter, for passing simple sets of arrays to a Climber instance. In theory this helps deal with providers that don't have their own Spotter (and you don't want to write a Spotter for them).
+
 ## [0.2.2] - 2018-03-31
 ### Added
 - Added the `baseClass` property and `compileClass` method to `Climber`. Adjusted the names of the various classes to work with these. This allows the user to modify the base CSS classes used to generate all the rest of the classes with a single line.
