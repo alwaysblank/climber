@@ -490,7 +490,7 @@ class Tree implements API\TreeAPI
 
     public function grow()
     {
-        return $this->tree;
+        return $this->tree ?? [];
     }
 
     /**

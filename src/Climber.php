@@ -161,19 +161,19 @@ class Climber implements API\ClimberAPI
             $testTarget = Z\Arrays::pluck($leaf, [2, 'target']);
             if ($testTarget === $target) {
                 $leaves[] = $id;
-            } elseif (!$strict) {
+            } elseif ( ! $strict) {
                 $parsedTarget     = parse_url($target);
                 $parsedTestTarget = parse_url($testTarget);
                 $matchPath        = isset($parsedTarget['path'])
-                && isset($parsedTestTarget['path'])
+                                    && isset($parsedTestTarget['path'])
                     ? ($parsedTarget['path'] === $parsedTestTarget['path'])
                     : true;
                 $matchQueries     = isset($parsedTarget['query'])
-                && isset($parsedTestTarget['query'])
+                                    && isset($parsedTestTarget['query'])
                     ? ($parsedTarget['query'] === $parsedTestTarget['query'])
                     : true;
                 $matchHashes      = isset($parsedTarget['fragment'])
-                && isset($parsedTestTarget['fragment'])
+                                    && isset($parsedTestTarget['fragment'])
                     ? ($parsedTarget['fragment'] === $parsedTestTarget['fragment'])
                     : true;
 
@@ -242,7 +242,7 @@ class Climber implements API\ClimberAPI
 
     public function element($echo = false)
     {
-        if (null != $this->tree->grow()) {
+        if ([] != $this->tree->grow()) {
             $topData = $this->runHook('top', [
                 'class'   => $this->compileClass($this->topClass),
                 'attrs'   => $this->attrs($this->topAttr),
